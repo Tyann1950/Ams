@@ -28,7 +28,20 @@
             border-radius: 0.75rem;
             margin-bottom: 2rem;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+            /* Adjusted for 4 columns on larger screens */
+            grid-template-columns: repeat(1, minmax(0, 1fr));
         }
+        @media (min-width: 768px) { /* md breakpoint */
+            .filter-section {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        @media (min-width: 1024px) { /* lg breakpoint */
+            .filter-section {
+                grid-template-columns: repeat(4, minmax(0, 1fr)); /* Changed to 4 columns */
+            }
+        }
+
         .filter-group label {
             font-weight: 600;
             color: #4a5568;
@@ -213,7 +226,7 @@
     <div class="container">
         <h1 class="text-3xl font-bold text-center mb-6 text-blue-800">Attrazioni di Amsterdam</h1>
 
-        <div class="filter-section grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="filter-section grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Filter by Type -->
             <div class="filter-group">
                 <label for="typeFilter" class="block text-sm">Filtra per Tipologia:</label>
@@ -234,6 +247,19 @@
                     <option value="default">Predefinito</option>
                     <option value="asc">Prezzo: Crescente</option>
                     <option value="desc">Prezzo: Decrescente</option>
+                </select>
+            </div>
+
+            <!-- Filter by Distance from Center (moved here) -->
+            <div class="filter-group">
+                <label for="distanceFilter" class="block text-sm">Filtra per Distanza dal Centro:</label>
+                <select id="distanceFilter" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                    <option value="Tutti">Tutti</option>
+                    <option value="<1km">< 1 km</option>
+                    <option value="1-3km">1 - 3 km</option>
+                    <option value=">3km">> 3 km</option>
+                    <option value=">10km">> 10 km</option>
+                    <option value=">50km">> 50 km</option>
                 </select>
             </div>
 
@@ -278,51 +304,101 @@
 
     <script>
         const attractionsData = [
-            { "Attrazione": "Dutch Resistance Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://www.verzetsmuseum.org/" },
-            { "Attrazione": "Amsterdam Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 15.00, "I amsterdam City Card": "", "link": "https://www.amsterdammuseum.nl/en" },
-            { "Attrazione": "Ons' Lieve Heer op Solder", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18", "Prezzo (€)": 16.00, "I amsterdam City Card": "✓", "link": "https://www.opsolder.nl/en/" },
-            { "Attrazione": "Banksy Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18", "Prezzo (€)": 16.50, "I amsterdam City Card": "", "link": "https://museumbanksy.nl/en/banksy-museum-amsterdam/" },
-            { "Attrazione": "Rembrandt House Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓", "link": "https://www.rembrandthuis.nl/en/" },
-            { "Attrazione": "Museo Marittimo Nazionale", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17 (mar-dom)", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓", "link": "https://www.hetscheepvaartmuseum.com/italian" },
-            { "Attrazione": "STRAAT Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18 (lun 12-)", "Prezzo (€)": 18.50, "I amsterdam City Card": "", "link": "https://straatmuseum.com/" },
-            { "Attrazione": "Jewish Cultural Quarter", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 20.00, "I amsterdam City Card": "", "link": "https://jck.nl/en" },
-            { "Attrazione": "Moco Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-20 (wend- 21)", "Prezzo (€)": 21.95, "I amsterdam City Card": "✓", "link": "https://www.mocomuseum.com/" },
-            { "Attrazione": "H'ART (ex Hermitage)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 22.00, "I amsterdam City Card": "", "link": "https://www.hartmuseum.nl/" },
-            { "Attrazione": "Stedelijk Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18 (ven 22)", "Prezzo (€)": 22.50, "I amsterdam City Card": "✓", "link": "https://www.stedelijk.nl/en" },
-            { "Attrazione": "Body Worlds", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-22", "Prezzo (€)": 22.50, "I amsterdam City Card": "", "link": "https://www.bodyworlds.nl/" },
-            { "Attrazione": "Van Gogh Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-19 (ven 21)", "Prezzo (€)": 24.00, "I amsterdam City Card": "", "link": "https://www.vangoghmuseum.nl/en" },
-            { "Attrazione": "Fabrique des Lumières", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-22", "Prezzo (€)": 24.00, "I amsterdam City Card": "", "link": "https://www.fabrique-lumieres.com/en" },
-            { "Attrazione": "Rijksmuseum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-17 tutti i giorni", "Prezzo (€)": 25.00, "I amsterdam City Card": "✓", "link": "https://www.rijksmuseum.nl/en" },
-            { "Attrazione": "Museum Vrolik", "Tipologia": "Scienza e natura", "Orari 2025": "10-17 (lun-ven)", "Prezzo (€)": 10.00, "I amsterdam City Card": "", "link": "https://www.amc.nl/web/home/zorg/museum-vrolik.htm" },
-            { "Attrazione": "Hortus Botanicus", "Tipologia": "Scienza e natura", "Orari 2025": "10-17", "Prezzo (€)": 12.50, "I amsterdam City Card": "✓", "link": "https://www.dehortus.nl/" },
-            { "Attrazione": "Micropia", "Tipologia": "Scienza e natura", "Orari 2025": "11-17", "Prezzo (€)": 17.50, "I amsterdam City Card": "", "link": "https://www.artis.nl/en/artis-micropia" },
-            { "Attrazione": "NEMO Science Museum", "Tipologia": "Scienza e natura", "Orari 2025": "mar-dom 10- 17:30", "Prezzo (€)": 21.50, "I amsterdam City Card": "✓", "link": "https://www.nemosciencemuseum.nl/en/" },
-            { "Attrazione": "ARTIS Royal Zoo", "Tipologia": "Scienza e natura", "Orari 2025": "09-18", "Prezzo (€)": 29.50, "I amsterdam City Card": "", "link": "https://www.artis.nl/en" },
-            { "Attrazione": "Our House (Electronic Music)", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "12-22 (gio-dom)", "Prezzo (€)": 19.50, "I amsterdam City Card": "✓", "link": "https://ourhouse.nyc/" },
-            { "Attrazione": "Upside Down Amsterdam", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "09-20 (ven-dom 21)", "Prezzo (€)": 20.95, "I amsterdam City Card": "", "link": "https://www.upsidedown.amsterdam/" },
-            { "Attrazione": "WONDR Experience", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "10-19", "Prezzo (€)": 24.50, "I amsterdam City Card": "", "link": "https://www.wondrexperience.com/" },
-            { "Attrazione": "This is Holland 5D", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "10-20", "Prezzo (€)": 26.00, "I amsterdam City Card": "✓", "link": "https://thisisholland.com/" },
-            { "Attrazione": "AMAZE Amsterdam", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "mer-sab 12-24", "Prezzo (€)": 27.50, "I amsterdam City Card": "", "link": "https://amaze-amsterdam.nl/" },
-            { "Attrazione": "Torre Westerkerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-20 (apr-ott)", "Prezzo (€)": 9.00, "I amsterdam City Card": "25%", "link": "https://www.westerkerk.nl/en/" },
-            { "Attrazione": "Nieuwe Kerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "11-17", "Prezzo (€)": 12.50, "I amsterdam City Card": "✓", "link": "https://www.nieuwekerk.nl/en/" },
-            { "Attrazione": "Oude Kerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-18 (lun-sab)", "Prezzo (€)": 13.50, "I amsterdam City Card": "", "link": "https://oudekerk.nl/en/" },
-            { "Attrazione": "Palazzo Reale", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-17", "Prezzo (€)": 13.50, "I amsterdam City Card": "", "link": "https://www.paleisamsterdam.nl/en/" },
-            { "Attrazione": "A'DAM Lookout", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-22", "Prezzo (€)": 18.50, "I amsterdam City Card": "", "link": "https://www.adamlookout.com/" },
-            { "Attrazione": "Volendam-Marken Express", "Tipologia": "Tour e Trasporti", "Orari 2025": "30 min", "Prezzo (€)": 9.50, "I amsterdam City Card": "✓", "link": "https://www.volendammarkenexpress.nl/en/" },
-            { "Attrazione": "Zaanse Schans (Mulini+Museo)", "Tipologia": "Tour e Trasporti", "Orari 2025": "10-17", "Prezzo (€)": 12.00, "I amsterdam City Card": "", "link": "https://www.zaanseschans.nl/en/" },
-            { "Attrazione": "Noleggio bici 24h", "Tipologia": "Tour e Trasporti", "Orari 2025": "orario libero", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://www.qualitybikerentamsterdam.nl/" },
-            { "Attrazione": "Crociera classica sui canali", "Tipologia": "Tour e Trasporti", "Orari 2025": "partenze 09-18 (1h)", "Prezzo (€)": 18.50, "I amsterdam City Card": "", "link": "https://www.rederijkooij.nl/en/" },
-            { "Attrazione": "Amsterdam Dungeon", "Tipologia": "Tour e Trasporti", "Orari 2025": "11-18", "Prezzo (€)": 24.00, "I amsterdam City Card": "25%", "link": "https://www.thedungeons.com/amsterdam/en/" },
-            { "Attrazione": "Heineken Experience", "Tipologia": "Tour e Trasporti", "Orari 2025": "10-19:30 (ven- sab 21)", "Prezzo (€)": 25.00, "I amsterdam City Card": "25%", "link": "https://www.heinekenexperience.com/" },
-            { "Attrazione": "Boom Chicago (Improv)", "Tipologia": "Tour e Trasporti", "Orari 2025": "serale", "Prezzo (€)": 25.00, "I amsterdam City Card": "", "link": "https://boomchicago.nl/" },
-            { "Attrazione": "Crociera serale (formaggio&vino)", "Tipologia": "Tour e Trasporti", "Orari 2025": "75 min", "Prezzo (€)": 26.00, "I amsterdam City Card": "25%", "link": "https://www.rederijkooij.nl/en/our-canal-cruises-amsterdam" },
-            { "Attrazione": "Johan Cruijff ArenA Tour", "Tipologia": "Tour e Trasporti", "Orari 2025": "09-17", "Prezzo (€)": 28.00, "I amsterdam City Card": "25%", "link": "https://english.ajax.nl/fans/johan-cruijff-arena-stadium-tour" }
+            // Musei principali (inclusi nel prezzo o con sconti)
+            { "Attrazione": "Rijksmuseum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-17 tutti i giorni", "Distanza dal Centro": "2.5 km", "Prezzo (€)": 25.00, "I amsterdam City Card": "✓", "link": "https://www.rijksmuseum.nl/en" },
+            { "Attrazione": "Moco Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-20 (wend- 21)", "Distanza dal Centro": "2.6 km", "Prezzo (€)": 21.95, "I amsterdam City Card": "✓", "link": "https://www.mocomuseum.com/" },
+            { "Attrazione": "Stedelijk Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18 (ven 22)", "Distanza dal Centro": "2.7 km", "Prezzo (€)": 22.50, "I amsterdam City Card": "✓", "link": "https://www.stedelijk.nl/en" },
+            { "Attrazione": "NEMO Science Museum", "Tipologia": "Scienza e natura", "Orari 2025": "mar-dom 10- 17:30", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 21.50, "I amsterdam City Card": "✓", "link": "https://www.nemosciencemuseum.nl/en/" },
+            { "Attrazione": "Rembrandt House Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18", "Distanza dal Centro": "1.2 km", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓", "link": "https://www.rembrandthuis.nl/en/" },
+            { "Attrazione": "Foam Photography Museum Amsterdam", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "1.8 km", "Prezzo (€)": 16.00, "I amsterdam City Card": "✓", "link": "https://www.foam.org/en/tickets" },
+            { "Attrazione": "Museo Marittimo Nazionale", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17 (mar-dom)", "Distanza dal Centro": "1.6 km", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓", "link": "https://www.hetscheepvaartmuseum.com/italian" },
+            { "Attrazione": "H'ART Museum (ex Hermitage)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 22.00, "I amsterdam City Card": "✓", "link": "https://www.hartmuseum.nl/" },
+            { "Attrazione": "Amsterdam Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Distanza dal Centro": "0.8 km", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://www.amsterdammuseum.nl/en" },
+            { "Attrazione": "Jewish Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 17.00, "I amsterdam City Card": "✓", "link": "https://jck.nl/en" },
+            { "Attrazione": "Museum Cobra", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "9 km", "Prezzo (€)": 16.00, "I amsterdam City Card": "✓", "link": "https://cobra-museum.nl/en/" },
+            { "Attrazione": "Museum of the Canals (Grachtenmuseum)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 16.00, "I amsterdam City Card": "✓", "link": "https://grachtenmuseum.nl/en/" },
+            { "Attrazione": "Wereldmuseum Amsterdam", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "1.7 km", "Prezzo (€)": 18.00, "I amsterdam City Card": "✓", "link": "https://wereldmuseum.nl/en/" },
+            { "Attrazione": "Museum Van Loon", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "1.7 km", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://www.museumvanloon.nl/en/" },
+            { "Attrazione": "Huis Marseille, Museum for Photography", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 12.00, "I amsterdam City Card": "✓", "link": "https://www.huismarseille.nl/en/" },
+            { "Attrazione": "Allard Pierson Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Distanza dal Centro": "0.7 km", "Prezzo (€)": 12.00, "I amsterdam City Card": "✓", "link": "https://allardpierson.nl/en/" },
+            { "Attrazione": "Amsterdam Pipe Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "1.9 km", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://www.pipemuseum.nl/" },
+            { "Attrazione": "Amsterdam Tulip Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "2.8 km", "Prezzo (€)": 5.00, "I amsterdam City Card": "✓", "link": "https://www.amsterdamtulipmuseum.com/" },
+            { "Attrazione": "Arcam (Amsterdam Centre for Architecture)", "Tipologia": "Panorami e Architettura", "Orari 2025": "13-17", "Distanza dal Centro": "1.3 km", "Prezzo (€)": 5.00, "I amsterdam City Card": "✓", "link": "https://arcam.nl/en/" },
+            { "Attrazione": "ARTIS Royal Zoo", "Tipologia": "Scienza e natura", "Orari 2025": "09-18", "Distanza dal Centro": "2.0 km", "Prezzo (€)": 29.50, "I amsterdam City Card": "✓", "link": "https://www.artis.nl/en" },
+            { "Attrazione": "ARTIS-Micropia", "Tipologia": "Scienza e natura", "Orari 2025": "11-17", "Distanza dal Centro": "2.1 km", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓", "link": "https://www.artis.nl/en/artis-micropia" },
+            { "Attrazione": "ARTIS – Groote Museum", "Tipologia": "Scienza e natura", "Orari 2025": "10-17", "Distanza dal Centro": "2.0 km", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓", "link": "https://www.artis.nl/en/plan-your-visit" },
+            { "Attrazione": "Diamond Museum", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "Vari", "Distanza dal Centro": "2.5 km", "Prezzo (€)": 10.00, "I amsterdam City Card": "✓", "link": "https://www.diamondmuseum.nl/" },
+            { "Attrazione": "Embassy of the Free Mind", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17 (mer-sab)", "Distanza dal Centro": "1.0 km", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://embassyofthefreemind.com/en/" },
+            { "Attrazione": "EYE Film Instituut Nederland", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "1.0 km", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://eyefilm.nl/en" },
+            { "Attrazione": "Geelvinck Pianola Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 10.00, "I amsterdam City Card": "✓", "link": "https://www.pianola.nl/en/" },
+            { "Attrazione": "Het Grachtenhuis – Grachtenmuseum Amsterdam", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 16.00, "I amsterdam City Card": "✓", "link": "https://grachtenmuseum.nl/en/" },
+            { "Attrazione": "Hermitage – Museum of the Mind", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 12.00, "I amsterdam City Card": "✓", "link": "https://www.museumvandegestalt.nl/en/" },
+            { "Attrazione": "Hortus Botanicus", "Tipologia": "Scienza e natura", "Orari 2025": "10-17", "Distanza dal Centro": "1.8 km", "Prezzo (€)": 12.50, "I amsterdam City Card": "✓", "link": "https://www.dehortus.nl/" },
+            { "Attrazione": "Luther Museum Amsterdam", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "1.0 km", "Prezzo (€)": 8.00, "I amsterdam City Card": "✓", "link": "https://luthermuseum.nl/en/" },
+            { "Attrazione": "Multatuli Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "0.5 km", "Prezzo (€)": 5.00, "I amsterdam City Card": "✓", "link": "https://multatuli-museum.nl/en/" },
+            { "Attrazione": "De Dageraad Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "3.5 km", "Prezzo (€)": 7.50, "I amsterdam City Card": "✓", "link": "https://www.hetschip.nl/en/museum-de-dageraad" },
+            { "Attrazione": "De Nieuwe Kerk Amsterdam", "Tipologia": "Panorami e Architettura", "Orari 2025": "11-17", "Distanza dal Centro": "0.2 km", "Prezzo (€)": 12.50, "I amsterdam City Card": "✓", "link": "https://www.nieuwekerk.nl/en/" },
+            { "Attrazione": "Outsider Art Museum – Hermitage", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://outsiderartmuseum.nl/en/" },
+            { "Attrazione": "De Oude Kerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-18 (lun-sab)", "Distanza dal Centro": "0.5 km", "Prezzo (€)": 13.50, "I amsterdam City Card": "✓", "link": "https://oudekerk.nl/en/" },
+            { "Attrazione": "Verzetsmuseum (Museo della Resistenza Olandese)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Distanza dal Centro": "2.0 km", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://www.verzetsmuseum.org/" },
+            { "Attrazione": "Woonbootmuseum (Museo delle Case Galleggianti)", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "Vari", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 5.00, "I amsterdam City Card": "✓", "link": "https://houseboatmuseum.nl/en/" },
+
+            // Altre attrazioni e attività incluse
+            { "Attrazione": "A'DAM LOOKOUT", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-22", "Distanza dal Centro": "0.8 km (traghetto)", "Prezzo (€)": 18.50, "I amsterdam City Card": "✓", "link": "https://www.adamlookout.com/" },
+            { "Attrazione": "Crociera sui canali (es. Blue Boat, Lovers)", "Tipologia": "Tour e Trasporti", "Orari 2025": "Partenze varie", "Distanza dal Centro": "Varie", "Prezzo (€)": 18.50, "I amsterdam City Card": "✓", "link": "https://www.rederijkooij.nl/en/" },
+            { "Attrazione": "Uso illimitato trasporti pubblici GVB", "Tipologia": "Tour e Trasporti", "Orari 2025": "24h", "Distanza dal Centro": "N/A", "Prezzo (€)": 0.00, "I amsterdam City Card": "✓", "link": "https://www.iamsterdam.com/it/biglietti/usare-la-city-card" },
+            { "Attrazione": "Noleggio bici 24h", "Tipologia": "Tour e Trasporti", "Orari 2025": "Orario libero", "Distanza dal Centro": "N/A", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://www.qualitybikerentamsterdam.nl/" },
+
+            // Attrazioni e musei fuori Amsterdam (inclusi nel prezzo o con sconti)
+            { "Attrazione": "Frans Hals Museum (Haarlem)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "20 km", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓", "link": "https://franshalsmuseum.nl/en/" },
+            { "Attrazione": "Teylers Museum (Haarlem)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "20 km", "Prezzo (€)": 16.00, "I amsterdam City Card": "✓", "link": "https://www.teylersmuseum.nl/en/" },
+            { "Attrazione": "Verwey Museum (Haarlem)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "20 km", "Prezzo (€)": 8.00, "I amsterdam City Card": "✓", "link": "https://www.verweymuseum.nl/" },
+            { "Attrazione": "Zaans Museum and Verkade Experience (Zaanse Schans)", "Tipologia": "Tour e Trasporti", "Orari 2025": "10-17", "Distanza dal Centro": "15 km", "Prezzo (€)": 14.50, "I amsterdam City Card": "✓", "link": "https://www.zaansmuseum.nl/en/" },
+            { "Attrazione": "Kuiperij Tiemstra (bottega del bottaio - Zaanse Schans)", "Tipologia": "Tour e Trasporti", "Orari 2025": "Vari", "Distanza dal Centro": "15 km", "Prezzo (€)": 3.00, "I amsterdam City Card": "✓", "link": "https://www.zaanseschans.nl/en/see-do/crafts/cooperage/" },
+            { "Attrazione": "Wevershuis – The Weavers' House (Zaanse Schans)", "Tipologia": "Tour e Trasporti", "Orari 2025": "Vari", "Distanza dal Centro": "15 km", "Prezzo (€)": 3.00, "I amsterdam City Card": "✓", "link": "https://www.zaanseschans.nl/en/see-do/crafts/weavershouse/" },
+            { "Attrazione": "House of Tsar Peter the Great (Zaandam)", "Tipologia": "Tour e Trasporti", "Orari 2025": "Vari", "Distanza dal Centro": "12 km", "Prezzo (€)": 5.00, "I amsterdam City Card": "✓", "link": "https://www.zaanseschans.nl/en/see-do/museums/house-of-peter-the-great/" },
+            { "Attrazione": "Molen Van Sloten (Mulino di Sloten)", "Tipologia": "Tour e Trasporti", "Orari 2025": "Vari", "Distanza dal Centro": "7 km", "Prezzo (€)": 7.50, "I amsterdam City Card": "✓", "link": "https://molenvansloten.nl/en/" },
+            { "Attrazione": "Museum Zaanse Tijd (Zaanse Schans)", "Tipologia": "Tour e Trasporti", "Orari 2025": "Vari", "Distanza dal Centro": "15 km", "Prezzo (€)": 12.00, "I amsterdam City Card": "✓", "link": "https://www.zaansetijd.nl/en/" },
+            { "Attrazione": "Zuiderzee Museum (Enkhuizen)", "Tipologia": "Tour e Trasporti", "Orari 2025": "Vari", "Distanza dal Centro": "60 km", "Prezzo (€)": 19.00, "I amsterdam City Card": "✓", "link": "https://www.zuiderzeemuseum.nl/en/" },
+            { "Attrazione": "Volendam-Marken ferry express", "Tipologia": "Tour e Trasporti", "Orari 2025": "30 min", "Distanza dal Centro": "20 km", "Prezzo (€)": 9.50, "I amsterdam City Card": "✓", "link": "https://www.volendammarkenexpress.nl/en/" },
+            { "Attrazione": "Castello di Muiderslot", "Tipologia": "Panorami e Architettura", "Orari 2025": "Vari", "Distanza dal Centro": "15 km", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓", "link": "https://muiderslot.nl/en/" },
+
+            // Sconti (generalmente 25% su attrazioni, spettacoli, ristoranti e negozi)
+            { "Attrazione": "Amsterdam Dungeon", "Tipologia": "Tour e Trasporti", "Orari 2025": "11-18", "Distanza dal Centro": "0.5 km", "Prezzo (€)": 24.00, "I amsterdam City Card": "25%", "link": "https://www.thedungeons.com/amsterdam/en/" },
+            { "Attrazione": "Tour dello stadio Johan Cruyff Arena", "Tipologia": "Tour e Trasporti", "Orari 2025": "09-17", "Distanza dal Centro": "9 km", "Prezzo (€)": 28.00, "I amsterdam City Card": "25%", "link": "https://english.ajax.nl/fans/johan-cruijff-arena-stadium-tour" },
+            { "Attrazione": "Body Worlds", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-22", "Distanza dal Centro": "0.3 km", "Prezzo (€)": 22.50, "I amsterdam City Card": "25%", "link": "https://www.bodyworlds.nl/" },
+            { "Attrazione": "Dutch cheese and wine o cocktail cruise", "Tipologia": "Tour e Trasporti", "Orari 2025": "75 min", "Distanza dal Centro": "Varie", "Prezzo (€)": 26.00, "I amsterdam City Card": "25%", "link": "https://www.rederijkooij.nl/en/our-canal-cruises-amsterdam" },
+            { "Attrazione": "Fabrique des Lumières", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-22", "Distanza dal Centro": "3.5 km", "Prezzo (€)": 24.00, "I amsterdam City Card": "25%", "link": "https://www.fabrique-lumieres.com/en" },
+            { "Attrazione": "House of Bols Cocktail & Genever Experience", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "Vari", "Distanza dal Centro": "2.5 km", "Prezzo (€)": 19.50, "I amsterdam City Card": "25%", "link": "https://bols.com/pages/cocktail-experience" },
+            { "Attrazione": "Het Kattenkabinet (Museo dei Gatti)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 13.00, "I amsterdam City Card": "25%", "link": "https://www.kattenkabinet.nl/en/" },
+            { "Attrazione": "Heineken Experience", "Tipologia": "Tour e Trasporti", "Orari 2025": "10-19:30 (ven- sab 21)", "Distanza dal Centro": "2.5 km", "Prezzo (€)": 25.00, "I amsterdam City Card": "25%", "link": "https://www.heinekenexperience.com/" },
+            { "Attrazione": "Madame Tussauds", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "Vari", "Distanza dal Centro": "0.1 km", "Prezzo (€)": 24.00, "I amsterdam City Card": "25%", "link": "https://www.madametussauds.com/amsterdam/en/" },
+            { "Attrazione": "This is Holland", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "10-20", "Distanza dal Centro": "0.8 km (traghetto)", "Prezzo (€)": 26.00, "I amsterdam City Card": "25%", "link": "https://thisisholland.com/" },
+            { "Attrazione": "Our House", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "12-22 (gio-dom)", "Distanza dal Centro": "1.0 km", "Prezzo (€)": 19.50, "I amsterdam City Card": "25%", "link": "https://ourhouse.nyc/" },
+            { "Attrazione": "The Upside Down Museum", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "09-20 (ven-dom 21)", "Distanza dal Centro": "3.0 km", "Prezzo (€)": 20.95, "I amsterdam City Card": "25%", "link": "https://www.upsidedown.amsterdam/" },
+            { "Attrazione": "WONDR Experience", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "10-19", "Distanza dal Centro": "3.2 km", "Prezzo (€)": 24.50, "I amsterdam City Card": "25%", "link": "https://www.wondrexperience.com/" },
+            { "Attrazione": "Red Light Secrets Museum", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "Vari", "Distanza dal Centro": "0.5 km", "Prezzo (€)": 14.00, "I amsterdam City Card": "25%", "link": "https://redlightsecrets.com/" },
+            { "Attrazione": "Bimhuis - Jazz", "Tipologia": "Tour e Trasporti", "Orari 2025": "Serale", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 20.00, "I amsterdam City Card": "25%", "link": "https://www.bimhuis.nl/en/" },
+            { "Attrazione": "Boom Chicago", "Tipologia": "Tour e Trasporti", "Orari 2025": "Serale", "Distanza dal Centro": "1.0 km", "Prezzo (€)": 25.00, "I amsterdam City Card": "25%", "link": "https://boomchicago.nl/" },
+            { "Attrazione": "Muziekgebouw aan 't IJ - Musica contemporanea e classica", "Tipologia": "Tour e Trasporti", "Orari 2025": "Vari", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 25.00, "I amsterdam City Card": "25%", "link": "https://www.muziekgebouw.nl/en" },
+            { "Attrazione": "Nationale Opera & Ballet", "Tipologia": "Tour e Trasporti", "Orari 2025": "Vari", "Distanza dal Centro": "1.0 km", "Prezzo (€)": 30.00, "I amsterdam City Card": "25%", "link": "https://www.operaballet.nl/en" },
+
+            // Attrazioni non incluse/scontate (dati precedenti non specificati dall'utente come inclusi/scontati nella nuova lista)
+            { "Attrazione": "Amsterdam Museum (sul fiume Amstel)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Distanza dal Centro": "0.8 km", "Prezzo (€)": 15.00, "I amsterdam City Card": "", "link": "https://www.amsterdammuseum.nl/en" },
+            { "Attrazione": "Van Gogh Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-19 (ven 21)", "Distanza dal Centro": "2.5 km", "Prezzo (€)": 24.00, "I amsterdam City Card": "", "link": "https://www.vangoghmuseum.nl/en" },
+            { "Attrazione": "Fabrique des Lumières (senza sconto)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-22", "Distanza dal Centro": "3.5 km", "Prezzo (€)": 24.00, "I amsterdam City Card": "", "link": "https://www.fabrique-lumieres.com/en" },
+            { "Attrazione": "Museum Vrolik", "Tipologia": "Scienza e natura", "Orari 2025": "10-17 (lun-ven)", "Distanza dal Centro": "4.0 km", "Prezzo (€)": 10.00, "I amsterdam City Card": "", "link": "https://www.amc.nl/web/home/zorg/museum-vrolik.htm" },
+            { "Attrazione": "AMAZE Amsterdam", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "mer-sab 12-24", "Distanza dal Centro": "3.0 km", "Prezzo (€)": 27.50, "I amsterdam City Card": "", "link": "https://amaze-amsterdam.nl/" },
+            { "Attrazione": "Palazzo Reale", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-17", "Distanza dal Centro": "0.1 km", "Prezzo (€)": 13.50, "I amsterdam City Card": "", "link": "https://www.paleisamsterdam.nl/en/" },
+            { "Attrazione": "Oude Kerk (senza inclusione)", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-18 (lun-sab)", "Distanza dal Centro": "0.5 km", "Prezzo (€)": 13.50, "I amsterdam City Card": "", "link": "https://oudekerk.nl/en/" },
+            { "Attrazione": "Zaanse Schans (solo area, senza card)", "Tipologia": "Tour e Trasporti", "Orari 2025": "10-17", "Distanza dal Centro": "15 km", "Prezzo (€)": 12.00, "I amsterdam City Card": "", "link": "https://www.zaanseschans.nl/en/" }
         ];
 
         const attractionsListDiv = document.getElementById('attractionsList');
         const typeFilter = document.getElementById('typeFilter');
         const priceSort = document.getElementById('priceSort');
         const cityCardFilters = document.querySelectorAll('input[name="cityCardFilter"]');
+        const distanceFilter = document.getElementById('distanceFilter'); // New filter element
         const generateItineraryBtn = document.getElementById('generateItineraryBtn');
         const itineraryModal = document.getElementById('itineraryModal');
         const closeButton = document.querySelector('.close-button');
@@ -330,9 +406,26 @@
         const loadingSpinner = document.getElementById('loadingSpinner');
         const buttonText = document.getElementById('buttonText');
 
-        // Function to render attractions
+        // Funzione per estrarre la distanza numerica da una stringa
+        function getNumericDistance(distanceString) {
+            if (distanceString === "N/A" || distanceString === "Varie") {
+                return Infinity; // Treat N/A or "Varie" as very far for filtering
+            }
+            const match = distanceString.match(/(\d+(\.\d+)?)\s*km/);
+            if (match) {
+                return parseFloat(match[1]);
+            }
+            // Handle cases like "0.8 km (traghetto)"
+            const ferryMatch = distanceString.match(/(\d+(\.\d+)?)\s*km\s*\(traghetto\)/);
+            if (ferryMatch) {
+                return parseFloat(ferryMatch[1]);
+            }
+            return Infinity; // Default for unparseable strings
+        }
+
+        // Funzione per renderizzare le attrazioni
         function renderAttractions(attractions) {
-            attractionsListDiv.innerHTML = ''; // Clear previous results
+            attractionsListDiv.innerHTML = ''; // Pulisce i risultati precedenti
 
             if (attractions.length === 0) {
                 attractionsListDiv.innerHTML = '<div class="no-results col-span-full">Nessun risultato trovato per i filtri selezionati.</div>';
@@ -356,7 +449,7 @@
                     cityCardStatusClass = 'not-included';
                 }
 
-                // Create the link HTML
+                // Crea il link HTML
                 const linkHtml = attraction.link ?
                     `<a href="${attraction.link}" target="_blank" class="official-link">
                         <i class="fas fa-external-link-alt"></i> Sito Ufficiale
@@ -368,6 +461,7 @@
                         <div class="attraction-name">${attraction["Attrazione"]}</div>
                         <div class="attraction-detail"><strong>Tipologia:</strong> ${attraction["Tipologia"]}</div>
                         <div class="attraction-detail"><strong>Orari 2025:</strong> ${attraction["Orari 2025"]}</div>
+                        <div class="attraction-detail"><strong>Distanza dal Centro:</strong> ${attraction["Distanza dal Centro"]}</div>
                         <div class="attraction-detail price"><strong>Prezzo:</strong> €${attraction["Prezzo (€)"].toFixed(2)}</div>
                         <div class="city-card-status ${cityCardStatusClass}"><strong>City Card:</strong> ${cityCardStatusText}</div>
                         ${linkHtml}
@@ -378,17 +472,17 @@
             });
         }
 
-        // Function to apply filters and sorting
+        // Funzione per applicare filtri e ordinamento
         function applyFiltersAndSort() {
             let filteredAttractions = [...attractionsData];
 
-            // Filter by Type
+            // Filtra per Tipologia
             const selectedType = typeFilter.value;
             if (selectedType !== 'Tutti') {
                 filteredAttractions = filteredAttractions.filter(attraction => attraction["Tipologia"] === selectedType);
             }
 
-            // Filter by City Card Inclusion
+            // Filtra per Inclusione City Card
             const selectedCityCardFilter = document.querySelector('input[name="cityCardFilter"]:checked').value;
             if (selectedCityCardFilter === 'included') {
                 filteredAttractions = filteredAttractions.filter(attraction => attraction["I amsterdam City Card"] === '✓');
@@ -396,7 +490,23 @@
                 filteredAttractions = filteredAttractions.filter(attraction => attraction["I amsterdam City Card"] === '' || attraction["I amsterdam City Card"] === '25%');
             }
 
-            // Sort by Price
+            // Filtra per Distanza dal Centro
+            const selectedDistance = distanceFilter.value;
+            if (selectedDistance !== 'Tutti') {
+                filteredAttractions = filteredAttractions.filter(attraction => {
+                    const distance = getNumericDistance(attraction["Distanza dal Centro"]);
+                    switch (selectedDistance) {
+                        case '<1km': return distance < 1;
+                        case '1-3km': return distance >= 1 && distance <= 3;
+                        case '>3km': return distance > 3 && distance <= 10; // Assuming >3km up to 10km for this category
+                        case '>10km': return distance > 10 && distance <= 50;
+                        case '>50km': return distance > 50;
+                        default: return true;
+                    }
+                });
+            }
+
+            // Ordina per Prezzo
             const sortOrder = priceSort.value;
             if (sortOrder === 'asc') {
                 filteredAttractions.sort((a, b) => a["Prezzo (€)"] - b["Prezzo (€)"]);
@@ -407,7 +517,7 @@
             renderAttractions(filteredAttractions);
         }
 
-        // Function to generate itinerary using Gemini API
+        // Funzione per generare l'itinerario usando l'API Gemini
         async function generateItinerary() {
             const selectedCheckboxes = document.querySelectorAll('.attraction-checkbox:checked');
             const selectedAttractions = Array.from(selectedCheckboxes).map(cb => cb.dataset.attractionName);
@@ -418,7 +528,7 @@
                 return;
             }
 
-            // Show loading spinner
+            // Mostra lo spinner di caricamento
             buttonText.classList.add('hidden');
             loadingSpinner.classList.remove('hidden');
             generateItineraryBtn.disabled = true;
@@ -428,7 +538,7 @@
             let chatHistory = [];
             chatHistory.push({ role: "user", parts: [{ text: prompt }] });
             const payload = { contents: chatHistory };
-            const apiKey = ""; // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.
+            const apiKey = ""; // Se vuoi usare modelli diversi da gemini-2.0-flash o imagen-3.0-generate-002, fornisci una chiave API qui. Altrimenti, lascia così com'è.
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
             try {
@@ -443,7 +553,7 @@
                     result.candidates[0].content && result.candidates[0].content.parts &&
                     result.candidates[0].content.parts.length > 0) {
                     const text = result.candidates[0].content.parts[0].text;
-                    itineraryContent.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`; // Display the response, replace newlines with <br>
+                    itineraryContent.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`; // Visualizza la risposta, sostituisce i newline con <br>
                 } else {
                     itineraryContent.innerHTML = '<p class="text-red-600">Errore nella generazione dell\'itinerario. Riprova.</p>';
                     console.error('Unexpected API response structure:', result);
@@ -452,11 +562,11 @@
                 itineraryContent.innerHTML = `<p class="text-red-600">Si è verificato un errore durante la comunicazione con l'AI: ${error.message}.</p>`;
                 console.error('Error calling Gemini API:', error);
             } finally {
-                // Hide loading spinner
+                // Nascondi lo spinner di caricamento
                 buttonText.classList.remove('hidden');
                 loadingSpinner.classList.add('hidden');
                 generateItineraryBtn.disabled = false;
-                itineraryModal.style.display = 'flex'; // Show modal after response or error
+                itineraryModal.style.display = 'flex'; // Mostra il modale dopo la risposta o l'errore
             }
         }
 
@@ -464,21 +574,22 @@
         typeFilter.addEventListener('change', applyFiltersAndSort);
         priceSort.addEventListener('change', applyFiltersAndSort);
         cityCardFilters.forEach(radio => radio.addEventListener('change', applyFiltersAndSort));
+        distanceFilter.addEventListener('change', applyFiltersAndSort); // New event listener for distance filter
         generateItineraryBtn.addEventListener('click', generateItinerary);
 
-        // Close modal when close button is clicked
+        // Chiudi il modale quando si clicca il pulsante di chiusura
         closeButton.addEventListener('click', () => {
             itineraryModal.style.display = 'none';
         });
 
-        // Close modal when clicking outside of it
+        // Chiudi il modale quando si clicca al di fuori di esso
         window.addEventListener('click', (event) => {
             if (event.target === itineraryModal) {
                 itineraryModal.style.display = 'none';
             }
         });
 
-        // Initial render
+        // Render iniziale
         applyFiltersAndSort();
     </script>
 </body>
