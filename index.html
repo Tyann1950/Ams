@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attrazioni di Amsterdam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .filter-section {
+            background-color: #e0e7ff;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+        .filter-group label {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        select, input[type="radio"] + label {
+            cursor: pointer;
+        }
+        .attraction-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+        .attraction-card:hover {
+            transform: translateY(-5px);
+        }
+        .attraction-name {
+            font-weight: 700;
+            color: #2c5282;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .attraction-detail {
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 0.25rem;
+        }
+        .price {
+            font-weight: 600;
+            color: #007bff;
+        }
+        .city-card-status {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        .city-card-status.included {
+            color: #28a745;
+        }
+        .city-card-status.not-included {
+            color: #dc3545;
+        }
+        .city-card-status.check-info {
+            color: #ffc107;
+        }
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #777;
+            font-style: italic;
+        }
+        /* Custom radio button styling */
+        input[type="radio"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #6366f1;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            position: relative;
+            top: 3px;
+        }
+        input[type="radio"]:checked {
+            background-color: #6366f1;
+            border-color: #6366f1;
+        }
+        input[type="radio"]:checked::after {
+            content: '';
+            display: block;
+            width: 0.5rem;
+            height: 0.5rem;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Checkbox styling */
+        .attraction-checkbox {
+            margin-top: 0.75rem;
+            align-self: flex-end; /* Pushes checkbox to the bottom right */
+            accent-color: #6366f1; /* Tailwind indigo-500 */
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 0.25rem;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            backdrop-filter: blur(5px); /* Blur background */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 700px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            cursor: pointer;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #6366f1;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="container">
+        <h1 class="text-3xl font-bold text-center mb-6 text-blue-800">Attrazioni di Amsterdam</h1>
+
+        <div class="filter-section grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Filter by Type -->
+            <div class="filter-group">
+                <label for="typeFilter" class="block text-sm">Filtra per Tipologia:</label>
+                <select id="typeFilter" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                    <option value="Tutti">Tutti</option>
+                    <option value="Museo d'arte/storia">Museo d'arte/storia</option>
+                    <option value="Scienza e natura">Scienza e natura</option>
+                    <option value="Esperienze e Famiglie">Esperienze e Famiglie</option>
+                    <option value="Panorami e Architettura">Panorami e Architettura</option>
+                    <option value="Tour e Trasporti">Tour e Trasporti</option>
+                </select>
+            </div>
+
+            <!-- Sort by Price -->
+            <div class="filter-group">
+                <label for="priceSort" class="block text-sm">Ordina per Prezzo:</label>
+                <select id="priceSort" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                    <option value="default">Predefinito</option>
+                    <option value="asc">Prezzo: Crescente</option>
+                    <option value="desc">Prezzo: Decrescente</option>
+                </select>
+            </div>
+
+            <!-- Filter by City Card Inclusion -->
+            <div class="filter-group">
+                <label class="block text-sm">Incluso con I Amsterdam City Card:</label>
+                <div class="mt-1 flex items-center space-x-4">
+                    <input type="radio" id="cardAll" name="cityCardFilter" value="all" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300" checked>
+                    <label for="cardAll" class="text-sm text-gray-700">Tutti</label>
+
+                    <input type="radio" id="cardIncluded" name="cityCardFilter" value="included" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                    <label for="cardIncluded" class="text-sm text-gray-700">Solo inclusi</label>
+
+                    <input type="radio" id="cardNotIncluded" name="cityCardFilter" value="notIncluded" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                    <label for="cardNotIncluded" class="text-sm text-gray-700">Solo non inclusi</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end mb-4">
+            <button id="generateItineraryBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out flex items-center">
+                <span id="buttonText">Genera Itinerario Personalizzato ✨</span>
+                <span id="loadingSpinner" class="spinner hidden"></span>
+            </button>
+        </div>
+
+        <div id="attractionsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Attractions will be loaded here -->
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="itineraryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 class="text-2xl font-bold mb-4 text-blue-800">Il Tuo Itinerario Personalizzato</h2>
+            <div id="itineraryContent" class="prose max-w-none">
+                <!-- Itinerary content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const attractionsData = [
+            { "Attrazione": "Dutch Resistance Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓" },
+            { "Attrazione": "Amsterdam Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 15.00, "I amsterdam City Card": "" },
+            { "Attrazione": "Ons' Lieve Heer op Solder", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18", "Prezzo (€)": 16.00, "I amsterdam City Card": "✓" },
+            { "Attrazione": "Banksy Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18", "Prezzo (€)": 16.50, "I amsterdam City Card": "" },
+            { "Attrazione": "Rembrandt House Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓" },
+            { "Attrazione": "Museo Marittimo Nazionale", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17 (mar-dom)", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓" },
+            { "Attrazione": "STRAAT Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18 (lun 12-)", "Prezzo (€)": 18.50, "I amsterdam City Card": "" },
+            { "Attrazione": "Jewish Cultural Quarter", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 20.00, "I amsterdam City Card": "" },
+            { "Attrazione": "Moco Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-20 (wend- 21)", "Prezzo (€)": 21.95, "I amsterdam City Card": "✓" },
+            { "Attrazione": "H'ART (ex Hermitage)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 22.00, "I amsterdam City Card": "" },
+            { "Attrazione": "Stedelijk Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18 (ven 22)", "Prezzo (€)": 22.50, "I amsterdam City Card": "✓" },
+            { "Attrazione": "Body Worlds", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-22", "Prezzo (€)": 22.50, "I amsterdam City Card": "" },
+            { "Attrazione": "Van Gogh Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-19 (ven 21)", "Prezzo (€)": 24.00, "I amsterdam City Card": "" },
+            { "Attrazione": "Fabrique des Lumières", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-22", "Prezzo (€)": 24.00, "I amsterdam City Card": "" },
+            { "Attrazione": "Rijksmuseum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-17 tutti i giorni", "Prezzo (€)": 25.00, "I amsterdam City Card": "✓" },
+            { "Attrazione": "Museum Vrolik", "Tipologia": "Scienza e natura", "Orari 2025": "10-17 (lun-ven)", "Prezzo (€)": 10.00, "I amsterdam City Card": "" },
+            { "Attrazione": "Hortus Botanicus", "Tipologia": "Scienza e natura", "Orari 2025": "10-17", "Prezzo (€)": 12.50, "I amsterdam City Card": "✓" },
+            { "Attrazione": "Micropia", "Tipologia": "Scienza e natura", "Orari 2025": "11-17", "Prezzo (€)": 17.50, "I amsterdam City Card": "" },
+            { "Attrazione": "NEMO Science Museum", "Tipologia": "Scienza e natura", "Orari 2025": "mar-dom 10- 17:30", "Prezzo (€)": 21.50, "I amsterdam City Card": "✓" },
+            { "Attrazione": "ARTIS Royal Zoo", "Tipologia": "Scienza e natura", "Orari 2025": "09-18", "Prezzo (€)": 29.50, "I amsterdam City Card": "" },
+            { "Attrazione": "Our House (Electronic Music)", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "12-22 (gio-dom)", "Prezzo (€)": 19.50, "I amsterdam City Card": "✓" },
+            { "Attrazione": "Upside Down Amsterdam", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "09-20 (ven-dom 21)", "Prezzo (€)": 20.95, "I amsterdam City Card": "" },
+            { "Attrazione": "WONDR Experience", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "10-19", "Prezzo (€)": 24.50, "I amsterdam City Card": "" },
+            { "Attrazione": "This is Holland 5D", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "10-20", "Prezzo (€)": 26.00, "I amsterdam City Card": "✓" },
+            { "Attrazione": "AMAZE Amsterdam", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "mer-sab 12-24", "Prezzo (€)": 27.50, "I amsterdam City Card": "" },
+            { "Attrazione": "Torre Westerkerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-20 (apr-ott)", "Prezzo (€)": 9.00, "I amsterdam City Card": "25%" },
+            { "Attrazione": "Nieuwe Kerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "11-17", "Prezzo (€)": 12.50, "I amsterdam City Card": "✓" },
+            { "Attrazione": "Oude Kerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-18 (lun-sab)", "Prezzo (€)": 13.50, "I amsterdam City Card": "" },
+            { "Attrazione": "Palazzo Reale", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-17", "Prezzo (€)": 13.50, "I amsterdam City Card": "" },
+            { "Attrazione": "A'DAM Lookout", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-22", "Prezzo (€)": 18.50, "I amsterdam City Card": "" },
+            { "Attrazione": "Volendam-Marken Express", "Tipologia": "Tour e Trasporti", "Orari 2025": "30 min", "Prezzo (€)": 9.50, "I amsterdam City Card": "✓" },
+            { "Attrazione": "Zaanse Schans (Mulini+Museo)", "Tipologia": "Tour e Trasporti", "Orari 2025": "10-17", "Prezzo (€)": 12.00, "I amsterdam City Card": "" },
+            { "Attrazione": "Noleggio bici 24h", "Tipologia": "Tour e Trasporti", "Orari 2025": "orario libero", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓" },
+            { "Attrazione": "Crociera classica sui canali", "Tipologia": "Tour e Trasporti", "Orari 2025": "partenze 09-18 (1h)", "Prezzo (€)": 18.50, "I amsterdam City Card": "" },
+            { "Attrazione": "Amsterdam Dungeon", "Tipologia": "Tour e Trasporti", "Orari 2025": "11-18", "Prezzo (€)": 24.00, "I amsterdam City Card": "25%" },
+            { "Attrazione": "Heineken Experience", "Tipologia": "Tour e Trasporti", "Orari 2025": "10-19:30 (ven- sab 21)", "Prezzo (€)": 25.00, "I amsterdam City Card": "25%" },
+            { "Attrazione": "Boom Chicago (Improv)", "Tipologia": "Tour e Trasporti", "Orari 2025": "serale", "Prezzo (€)": 25.00, "I amsterdam City Card": "" },
+            { "Attrazione": "Crociera serale (formaggio&vino)", "Tipologia": "Tour e Trasporti", "Orari 2025": "75 min", "Prezzo (€)": 26.00, "I amsterdam City Card": "25%" },
+            { "Attrazione": "Johan Cruijff ArenA Tour", "Tipologia": "Tour e Trasporti", "Orari 2025": "09-17", "Prezzo (€)": 28.00, "I amsterdam City Card": "25%" }
+        ];
+
+        const attractionsListDiv = document.getElementById('attractionsList');
+        const typeFilter = document.getElementById('typeFilter');
+        const priceSort = document.getElementById('priceSort');
+        const cityCardFilters = document.querySelectorAll('input[name="cityCardFilter"]');
+        const generateItineraryBtn = document.getElementById('generateItineraryBtn');
+        const itineraryModal = document.getElementById('itineraryModal');
+        const closeButton = document.querySelector('.close-button');
+        const itineraryContent = document.getElementById('itineraryContent');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const buttonText = document.getElementById('buttonText');
+
+        // Function to render attractions
+        function renderAttractions(attractions) {
+            attractionsListDiv.innerHTML = ''; // Clear previous results
+
+            if (attractions.length === 0) {
+                attractionsListDiv.innerHTML = '<div class="no-results col-span-full">Nessun risultato trovato per i filtri selezionati.</div>';
+                return;
+            }
+
+            attractions.forEach(attraction => {
+                const card = document.createElement('div');
+                card.className = 'attraction-card';
+
+                let cityCardStatusText = '';
+                let cityCardStatusClass = '';
+                if (attraction["I amsterdam City Card"] === '✓') {
+                    cityCardStatusText = 'Incluso ✅';
+                    cityCardStatusClass = 'included';
+                } else if (attraction["I amsterdam City Card"] === '25%') {
+                    cityCardStatusText = 'Sconto 25% 🏷️';
+                    cityCardStatusClass = 'check-info';
+                } else {
+                    cityCardStatusText = 'Non incluso ❌';
+                    cityCardStatusClass = 'not-included';
+                }
+
+                card.innerHTML = `
+                    <div class="attraction-name">${attraction["Attrazione"]}</div>
+                    <div class="attraction-detail"><strong>Tipologia:</strong> ${attraction["Tipologia"]}</div>
+                    <div class="attraction-detail"><strong>Orari 2025:</strong> ${attraction["Orari 2025"]}</div>
+                    <div class="attraction-detail price"><strong>Prezzo:</strong> €${attraction["Prezzo (€)"].toFixed(2)}</div>
+                    <div class="city-card-status ${cityCardStatusClass}"><strong>City Card:</strong> ${cityCardStatusText}</div>
+                    <input type="checkbox" class="attraction-checkbox" data-attraction-name="${attraction["Attrazione"]}">
+                `;
+                attractionsListDiv.appendChild(card);
+            });
+        }
+
+        // Function to apply filters and sorting
+        function applyFiltersAndSort() {
+            let filteredAttractions = [...attractionsData];
+
+            // Filter by Type
+            const selectedType = typeFilter.value;
+            if (selectedType !== 'Tutti') {
+                filteredAttractions = filteredAttractions.filter(attraction => attraction["Tipologia"] === selectedType);
+            }
+
+            // Filter by City Card Inclusion
+            const selectedCityCardFilter = document.querySelector('input[name="cityCardFilter"]:checked').value;
+            if (selectedCityCardFilter === 'included') {
+                filteredAttractions = filteredAttractions.filter(attraction => attraction["I amsterdam City Card"] === '✓');
+            } else if (selectedCityCardFilter === 'notIncluded') {
+                filteredAttractions = filteredAttractions.filter(attraction => attraction["I amsterdam City Card"] === '' || attraction["I amsterdam City Card"] === '25%');
+            }
+
+            // Sort by Price
+            const sortOrder = priceSort.value;
+            if (sortOrder === 'asc') {
+                filteredAttractions.sort((a, b) => a["Prezzo (€)"] - b["Prezzo (€)"]);
+            } else if (sortOrder === 'desc') {
+                filteredAttractions.sort((a, b) => b["Prezzo (€)"] - a["Prezzo (€)"]);
+            }
+
+            renderAttractions(filteredAttractions);
+        }
+
+        // Function to generate itinerary using Gemini API
+        async function generateItinerary() {
+            const selectedCheckboxes = document.querySelectorAll('.attraction-checkbox:checked');
+            const selectedAttractions = Array.from(selectedCheckboxes).map(cb => cb.dataset.attractionName);
+
+            if (selectedAttractions.length === 0) {
+                itineraryContent.innerHTML = '<p class="text-red-600">Seleziona almeno un\'attrazione per generare un itinerario.</p>';
+                itineraryModal.style.display = 'flex';
+                return;
+            }
+
+            // Show loading spinner
+            buttonText.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+            generateItineraryBtn.disabled = true;
+
+            const prompt = `Crea un itinerario di un giorno per visitare le seguenti attrazioni di Amsterdam. Per ogni attrazione, suggerisci l'ordine di visita, una stima del tempo necessario e un breve punto saliente. Se possibile, raggruppa le attrazioni vicine. Le attrazioni sono: ${selectedAttractions.join(', ')}.`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    itineraryContent.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`; // Display the response, replace newlines with <br>
+                } else {
+                    itineraryContent.innerHTML = '<p class="text-red-600">Errore nella generazione dell\'itinerario. Riprova.</p>';
+                    console.error('Unexpected API response structure:', result);
+                }
+            } catch (error) {
+                itineraryContent.innerHTML = `<p class="text-red-600">Si è verificato un errore durante la comunicazione con l'AI: ${error.message}.</p>`;
+                console.error('Error calling Gemini API:', error);
+            } finally {
+                // Hide loading spinner
+                buttonText.classList.remove('hidden');
+                loadingSpinner.classList.add('hidden');
+                generateItineraryBtn.disabled = false;
+                itineraryModal.style.display = 'flex'; // Show modal after response or error
+            }
+        }
+
+        // Event Listeners
+        typeFilter.addEventListener('change', applyFiltersAndSort);
+        priceSort.addEventListener('change', applyFiltersAndSort);
+        cityCardFilters.forEach(radio => radio.addEventListener('change', applyFiltersAndSort));
+        generateItineraryBtn.addEventListener('click', generateItinerary);
+
+        // Close modal when close button is clicked
+        closeButton.addEventListener('click', () => {
+            itineraryModal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside of it
+        window.addEventListener('click', (event) => {
+            if (event.target === itineraryModal) {
+                itineraryModal.style.display = 'none';
+            }
+        });
+
+        // Initial render
+        applyFiltersAndSort();
+    </script>
+</body>
+</html>
