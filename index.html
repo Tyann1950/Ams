@@ -6,6 +6,8 @@
     <title>Attrazioni di Amsterdam</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for external link icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -46,6 +48,7 @@
             transition: transform 0.2s ease-in-out;
             display: flex;
             flex-direction: column;
+            justify-content: space-between; /* Distributes space */
         }
         .attraction-card:hover {
             transform: translateY(-5px);
@@ -189,6 +192,21 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .official-link {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+        .official-link i {
+            margin-right: 0.4rem;
+            color: #2c5282;
+        }
+        .official-link:hover {
+            text-decoration: underline;
+            color: #2c5282;
+        }
     </style>
 </head>
 <body class="p-4">
@@ -260,45 +278,45 @@
 
     <script>
         const attractionsData = [
-            { "Attrazione": "Dutch Resistance Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓" },
-            { "Attrazione": "Amsterdam Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 15.00, "I amsterdam City Card": "" },
-            { "Attrazione": "Ons' Lieve Heer op Solder", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18", "Prezzo (€)": 16.00, "I amsterdam City Card": "✓" },
-            { "Attrazione": "Banksy Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18", "Prezzo (€)": 16.50, "I amsterdam City Card": "" },
-            { "Attrazione": "Rembrandt House Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓" },
-            { "Attrazione": "Museo Marittimo Nazionale", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17 (mar-dom)", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓" },
-            { "Attrazione": "STRAAT Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18 (lun 12-)", "Prezzo (€)": 18.50, "I amsterdam City Card": "" },
-            { "Attrazione": "Jewish Cultural Quarter", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 20.00, "I amsterdam City Card": "" },
-            { "Attrazione": "Moco Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-20 (wend- 21)", "Prezzo (€)": 21.95, "I amsterdam City Card": "✓" },
-            { "Attrazione": "H'ART (ex Hermitage)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 22.00, "I amsterdam City Card": "" },
-            { "Attrazione": "Stedelijk Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18 (ven 22)", "Prezzo (€)": 22.50, "I amsterdam City Card": "✓" },
-            { "Attrazione": "Body Worlds", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-22", "Prezzo (€)": 22.50, "I amsterdam City Card": "" },
-            { "Attrazione": "Van Gogh Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-19 (ven 21)", "Prezzo (€)": 24.00, "I amsterdam City Card": "" },
-            { "Attrazione": "Fabrique des Lumières", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-22", "Prezzo (€)": 24.00, "I amsterdam City Card": "" },
-            { "Attrazione": "Rijksmuseum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-17 tutti i giorni", "Prezzo (€)": 25.00, "I amsterdam City Card": "✓" },
-            { "Attrazione": "Museum Vrolik", "Tipologia": "Scienza e natura", "Orari 2025": "10-17 (lun-ven)", "Prezzo (€)": 10.00, "I amsterdam City Card": "" },
-            { "Attrazione": "Hortus Botanicus", "Tipologia": "Scienza e natura", "Orari 2025": "10-17", "Prezzo (€)": 12.50, "I amsterdam City Card": "✓" },
-            { "Attrazione": "Micropia", "Tipologia": "Scienza e natura", "Orari 2025": "11-17", "Prezzo (€)": 17.50, "I amsterdam City Card": "" },
-            { "Attrazione": "NEMO Science Museum", "Tipologia": "Scienza e natura", "Orari 2025": "mar-dom 10- 17:30", "Prezzo (€)": 21.50, "I amsterdam City Card": "✓" },
-            { "Attrazione": "ARTIS Royal Zoo", "Tipologia": "Scienza e natura", "Orari 2025": "09-18", "Prezzo (€)": 29.50, "I amsterdam City Card": "" },
-            { "Attrazione": "Our House (Electronic Music)", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "12-22 (gio-dom)", "Prezzo (€)": 19.50, "I amsterdam City Card": "✓" },
-            { "Attrazione": "Upside Down Amsterdam", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "09-20 (ven-dom 21)", "Prezzo (€)": 20.95, "I amsterdam City Card": "" },
-            { "Attrazione": "WONDR Experience", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "10-19", "Prezzo (€)": 24.50, "I amsterdam City Card": "" },
-            { "Attrazione": "This is Holland 5D", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "10-20", "Prezzo (€)": 26.00, "I amsterdam City Card": "✓" },
-            { "Attrazione": "AMAZE Amsterdam", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "mer-sab 12-24", "Prezzo (€)": 27.50, "I amsterdam City Card": "" },
-            { "Attrazione": "Torre Westerkerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-20 (apr-ott)", "Prezzo (€)": 9.00, "I amsterdam City Card": "25%" },
-            { "Attrazione": "Nieuwe Kerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "11-17", "Prezzo (€)": 12.50, "I amsterdam City Card": "✓" },
-            { "Attrazione": "Oude Kerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-18 (lun-sab)", "Prezzo (€)": 13.50, "I amsterdam City Card": "" },
-            { "Attrazione": "Palazzo Reale", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-17", "Prezzo (€)": 13.50, "I amsterdam City Card": "" },
-            { "Attrazione": "A'DAM Lookout", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-22", "Prezzo (€)": 18.50, "I amsterdam City Card": "" },
-            { "Attrazione": "Volendam-Marken Express", "Tipologia": "Tour e Trasporti", "Orari 2025": "30 min", "Prezzo (€)": 9.50, "I amsterdam City Card": "✓" },
-            { "Attrazione": "Zaanse Schans (Mulini+Museo)", "Tipologia": "Tour e Trasporti", "Orari 2025": "10-17", "Prezzo (€)": 12.00, "I amsterdam City Card": "" },
-            { "Attrazione": "Noleggio bici 24h", "Tipologia": "Tour e Trasporti", "Orari 2025": "orario libero", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓" },
-            { "Attrazione": "Crociera classica sui canali", "Tipologia": "Tour e Trasporti", "Orari 2025": "partenze 09-18 (1h)", "Prezzo (€)": 18.50, "I amsterdam City Card": "" },
-            { "Attrazione": "Amsterdam Dungeon", "Tipologia": "Tour e Trasporti", "Orari 2025": "11-18", "Prezzo (€)": 24.00, "I amsterdam City Card": "25%" },
-            { "Attrazione": "Heineken Experience", "Tipologia": "Tour e Trasporti", "Orari 2025": "10-19:30 (ven- sab 21)", "Prezzo (€)": 25.00, "I amsterdam City Card": "25%" },
-            { "Attrazione": "Boom Chicago (Improv)", "Tipologia": "Tour e Trasporti", "Orari 2025": "serale", "Prezzo (€)": 25.00, "I amsterdam City Card": "" },
-            { "Attrazione": "Crociera serale (formaggio&vino)", "Tipologia": "Tour e Trasporti", "Orari 2025": "75 min", "Prezzo (€)": 26.00, "I amsterdam City Card": "25%" },
-            { "Attrazione": "Johan Cruijff ArenA Tour", "Tipologia": "Tour e Trasporti", "Orari 2025": "09-17", "Prezzo (€)": 28.00, "I amsterdam City Card": "25%" }
+            { "Attrazione": "Dutch Resistance Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://www.verzetsmuseum.org/" },
+            { "Attrazione": "Amsterdam Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 15.00, "I amsterdam City Card": "", "link": "https://www.amsterdammuseum.nl/en" },
+            { "Attrazione": "Ons' Lieve Heer op Solder", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18", "Prezzo (€)": 16.00, "I amsterdam City Card": "✓", "link": "https://www.opsolder.nl/en/" },
+            { "Attrazione": "Banksy Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18", "Prezzo (€)": 16.50, "I amsterdam City Card": "", "link": "https://museumbanksy.nl/en/banksy-museum-amsterdam/" },
+            { "Attrazione": "Rembrandt House Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓", "link": "https://www.rembrandthuis.nl/en/" },
+            { "Attrazione": "Museo Marittimo Nazionale", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17 (mar-dom)", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓", "link": "https://www.hetscheepvaartmuseum.com/italian" },
+            { "Attrazione": "STRAAT Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18 (lun 12-)", "Prezzo (€)": 18.50, "I amsterdam City Card": "", "link": "https://straatmuseum.com/" },
+            { "Attrazione": "Jewish Cultural Quarter", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 20.00, "I amsterdam City Card": "", "link": "https://jck.nl/en" },
+            { "Attrazione": "Moco Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-20 (wend- 21)", "Prezzo (€)": 21.95, "I amsterdam City Card": "✓", "link": "https://www.mocomuseum.com/" },
+            { "Attrazione": "H'ART (ex Hermitage)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Prezzo (€)": 22.00, "I amsterdam City Card": "", "link": "https://www.hartmuseum.nl/" },
+            { "Attrazione": "Stedelijk Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-18 (ven 22)", "Prezzo (€)": 22.50, "I amsterdam City Card": "✓", "link": "https://www.stedelijk.nl/en" },
+            { "Attrazione": "Body Worlds", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-22", "Prezzo (€)": 22.50, "I amsterdam City Card": "", "link": "https://www.bodyworlds.nl/" },
+            { "Attrazione": "Van Gogh Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-19 (ven 21)", "Prezzo (€)": 24.00, "I amsterdam City Card": "", "link": "https://www.vangoghmuseum.nl/en" },
+            { "Attrazione": "Fabrique des Lumières", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-22", "Prezzo (€)": 24.00, "I amsterdam City Card": "", "link": "https://www.fabrique-lumieres.com/en" },
+            { "Attrazione": "Rijksmuseum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-17 tutti i giorni", "Prezzo (€)": 25.00, "I amsterdam City Card": "✓", "link": "https://www.rijksmuseum.nl/en" },
+            { "Attrazione": "Museum Vrolik", "Tipologia": "Scienza e natura", "Orari 2025": "10-17 (lun-ven)", "Prezzo (€)": 10.00, "I amsterdam City Card": "", "link": "https://www.amc.nl/web/home/zorg/museum-vrolik.htm" },
+            { "Attrazione": "Hortus Botanicus", "Tipologia": "Scienza e natura", "Orari 2025": "10-17", "Prezzo (€)": 12.50, "I amsterdam City Card": "✓", "link": "https://www.dehortus.nl/" },
+            { "Attrazione": "Micropia", "Tipologia": "Scienza e natura", "Orari 2025": "11-17", "Prezzo (€)": 17.50, "I amsterdam City Card": "", "link": "https://www.artis.nl/en/artis-micropia" },
+            { "Attrazione": "NEMO Science Museum", "Tipologia": "Scienza e natura", "Orari 2025": "mar-dom 10- 17:30", "Prezzo (€)": 21.50, "I amsterdam City Card": "✓", "link": "https://www.nemosciencemuseum.nl/en/" },
+            { "Attrazione": "ARTIS Royal Zoo", "Tipologia": "Scienza e natura", "Orari 2025": "09-18", "Prezzo (€)": 29.50, "I amsterdam City Card": "", "link": "https://www.artis.nl/en" },
+            { "Attrazione": "Our House (Electronic Music)", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "12-22 (gio-dom)", "Prezzo (€)": 19.50, "I amsterdam City Card": "✓", "link": "https://ourhouse.nyc/" },
+            { "Attrazione": "Upside Down Amsterdam", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "09-20 (ven-dom 21)", "Prezzo (€)": 20.95, "I amsterdam City Card": "", "link": "https://www.upsidedown.amsterdam/" },
+            { "Attrazione": "WONDR Experience", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "10-19", "Prezzo (€)": 24.50, "I amsterdam City Card": "", "link": "https://www.wondrexperience.com/" },
+            { "Attrazione": "This is Holland 5D", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "10-20", "Prezzo (€)": 26.00, "I amsterdam City Card": "✓", "link": "https://thisisholland.com/" },
+            { "Attrazione": "AMAZE Amsterdam", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "mer-sab 12-24", "Prezzo (€)": 27.50, "I amsterdam City Card": "", "link": "https://amaze-amsterdam.nl/" },
+            { "Attrazione": "Torre Westerkerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-20 (apr-ott)", "Prezzo (€)": 9.00, "I amsterdam City Card": "25%", "link": "https://www.westerkerk.nl/en/" },
+            { "Attrazione": "Nieuwe Kerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "11-17", "Prezzo (€)": 12.50, "I amsterdam City Card": "✓", "link": "https://www.nieuwekerk.nl/en/" },
+            { "Attrazione": "Oude Kerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-18 (lun-sab)", "Prezzo (€)": 13.50, "I amsterdam City Card": "", "link": "https://oudekerk.nl/en/" },
+            { "Attrazione": "Palazzo Reale", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-17", "Prezzo (€)": 13.50, "I amsterdam City Card": "", "link": "https://www.paleisamsterdam.nl/en/" },
+            { "Attrazione": "A'DAM Lookout", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-22", "Prezzo (€)": 18.50, "I amsterdam City Card": "", "link": "https://www.adamlookout.com/" },
+            { "Attrazione": "Volendam-Marken Express", "Tipologia": "Tour e Trasporti", "Orari 2025": "30 min", "Prezzo (€)": 9.50, "I amsterdam City Card": "✓", "link": "https://www.volendammarkenexpress.nl/en/" },
+            { "Attrazione": "Zaanse Schans (Mulini+Museo)", "Tipologia": "Tour e Trasporti", "Orari 2025": "10-17", "Prezzo (€)": 12.00, "I amsterdam City Card": "", "link": "https://www.zaanseschans.nl/en/" },
+            { "Attrazione": "Noleggio bici 24h", "Tipologia": "Tour e Trasporti", "Orari 2025": "orario libero", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://www.qualitybikerentamsterdam.nl/" },
+            { "Attrazione": "Crociera classica sui canali", "Tipologia": "Tour e Trasporti", "Orari 2025": "partenze 09-18 (1h)", "Prezzo (€)": 18.50, "I amsterdam City Card": "", "link": "https://www.rederijkooij.nl/en/" },
+            { "Attrazione": "Amsterdam Dungeon", "Tipologia": "Tour e Trasporti", "Orari 2025": "11-18", "Prezzo (€)": 24.00, "I amsterdam City Card": "25%", "link": "https://www.thedungeons.com/amsterdam/en/" },
+            { "Attrazione": "Heineken Experience", "Tipologia": "Tour e Trasporti", "Orari 2025": "10-19:30 (ven- sab 21)", "Prezzo (€)": 25.00, "I amsterdam City Card": "25%", "link": "https://www.heinekenexperience.com/" },
+            { "Attrazione": "Boom Chicago (Improv)", "Tipologia": "Tour e Trasporti", "Orari 2025": "serale", "Prezzo (€)": 25.00, "I amsterdam City Card": "", "link": "https://boomchicago.nl/" },
+            { "Attrazione": "Crociera serale (formaggio&vino)", "Tipologia": "Tour e Trasporti", "Orari 2025": "75 min", "Prezzo (€)": 26.00, "I amsterdam City Card": "25%", "link": "https://www.rederijkooij.nl/en/our-canal-cruises-amsterdam" },
+            { "Attrazione": "Johan Cruijff ArenA Tour", "Tipologia": "Tour e Trasporti", "Orari 2025": "09-17", "Prezzo (€)": 28.00, "I amsterdam City Card": "25%", "link": "https://english.ajax.nl/fans/johan-cruijff-arena-stadium-tour" }
         ];
 
         const attractionsListDiv = document.getElementById('attractionsList');
@@ -338,12 +356,22 @@
                     cityCardStatusClass = 'not-included';
                 }
 
+                // Create the link HTML
+                const linkHtml = attraction.link ?
+                    `<a href="${attraction.link}" target="_blank" class="official-link">
+                        <i class="fas fa-external-link-alt"></i> Sito Ufficiale
+                    </a>` :
+                    `<div class="official-link text-gray-500">Link non disponibile</div>`;
+
                 card.innerHTML = `
-                    <div class="attraction-name">${attraction["Attrazione"]}</div>
-                    <div class="attraction-detail"><strong>Tipologia:</strong> ${attraction["Tipologia"]}</div>
-                    <div class="attraction-detail"><strong>Orari 2025:</strong> ${attraction["Orari 2025"]}</div>
-                    <div class="attraction-detail price"><strong>Prezzo:</strong> €${attraction["Prezzo (€)"].toFixed(2)}</div>
-                    <div class="city-card-status ${cityCardStatusClass}"><strong>City Card:</strong> ${cityCardStatusText}</div>
+                    <div>
+                        <div class="attraction-name">${attraction["Attrazione"]}</div>
+                        <div class="attraction-detail"><strong>Tipologia:</strong> ${attraction["Tipologia"]}</div>
+                        <div class="attraction-detail"><strong>Orari 2025:</strong> ${attraction["Orari 2025"]}</div>
+                        <div class="attraction-detail price"><strong>Prezzo:</strong> €${attraction["Prezzo (€)"].toFixed(2)}</div>
+                        <div class="city-card-status ${cityCardStatusClass}"><strong>City Card:</strong> ${cityCardStatusText}</div>
+                        ${linkHtml}
+                    </div>
                     <input type="checkbox" class="attraction-checkbox" data-attraction-name="${attraction["Attrazione"]}">
                 `;
                 attractionsListDiv.appendChild(card);
