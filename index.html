@@ -19,11 +19,12 @@
         }
         .container {
             max-width: 500px;
+            width: 90%;
             padding: 2rem;
             background-color: #ffffff;
             border-radius: 1rem;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: center; /* Ensures content inside container is centered */
+            text-align: center; /* Assicura che il contenuto nel container sia centrato */
         }
         h1 {
             font-size: 2.25rem;
@@ -37,26 +38,27 @@
             border: 1px solid #cbd5e0;
             border-radius: 0.5rem;
             font-size: 1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.5rem; 
             background-color: #f8fafc;
-            appearance: none; /* Remove default arrow */
+            appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%234A5568'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 0.75rem center;
             background-size: 1.25rem;
+            text-align: center;
+            padding-right: 2.5rem;
         }
         button {
             background-color: #6366f1;
             color: white;
             font-weight: 600;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+            /* Il padding è stato spostato inline per forzare l'aggiornamento */
+            box-shadow: 0 2px 6px rgba(99, 102, 240, 0.3);
             transition: background-color 0.3s ease, transform 0.2s ease;
             cursor: pointer;
-            margin-top: 2.5rem; /* Increased margin-top to lower the button */
+            border: none; /* Rimuove il bordo predefinito */
         }
         button:hover {
             background-color: #4f46e5;
@@ -67,7 +69,7 @@
 <body>
     <div class="container">
         <h1>Benvenuto!</h1>
-        <p class="text-lg mb-4">Scegli la città che desideri esplorare:</p>
+        <p class="text-lg mb-6">Scegli la città che desideri esplorare:</p>
         
         <select id="citySelect">
             <option value="amsterdam.html">Amsterdam</option>
@@ -75,7 +77,11 @@
             <!-- Aggiungi altre città qui in futuro, es: <option value="roma.html">Roma</option> -->
         </select>
         
-        <button id="exploreButton">Esplora</button>
+        <!-- Distanziatore per forzare lo spazio -->
+        <div style="height: 2rem;"></div>
+
+        <!-- MODIFICA: Stile applicato direttamente qui per forzare l'aggiornamento -->
+        <button id="exploreButton" style="padding: 1rem 4rem; border-radius: 50px;">Esplora</button>
     </div>
 
     <script>
@@ -83,7 +89,7 @@
             const citySelect = document.getElementById('citySelect');
             const selectedPage = citySelect.value;
             if (selectedPage) {
-                // Modificato per utilizzare window.open con _self, più robusto in vari contesti
+                // Reindirizza alla pagina selezionata
                 window.open(selectedPage, '_self'); 
             }
         });
