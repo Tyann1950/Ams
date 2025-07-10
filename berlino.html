@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attrazioni di Berlino</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for external link icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .filter-section {
+            background-color: #eef2ff; /* Colore più tenue per Berlino */
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+        .filter-group label {
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        select, input[type="radio"] + label {
+            cursor: pointer;
+        }
+        .attraction-card {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .attraction-card:hover {
+            transform: translateY(-5px);
+        }
+        .attraction-name {
+            font-weight: 700;
+            color: #1e3a8a;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .attraction-detail {
+            font-size: 0.95rem;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+        .price {
+            font-weight: 600;
+            color: #1d4ed8;
+        }
+        .city-card-status {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        .city-card-status.included { color: #16a34a; }
+        .city-card-status.not-included { color: #dc2626; }
+        .city-card-status.check-info { color: #f59e0b; }
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+            font-style: italic;
+        }
+        input[type="radio"] {
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
+            display: inline-block;
+            width: 1rem; height: 1rem;
+            border: 2px solid #6366f1;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            position: relative; top: 3px;
+        }
+        input[type="radio"]:checked { background-color: #6366f1; border-color: #6366f1; }
+        input[type="radio"]:checked::after {
+            content: ''; display: block;
+            width: 0.5rem; height: 0.5rem;
+            background: white; border-radius: 50%;
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .attraction-checkbox {
+            margin-top: 0.75rem;
+            align-self: flex-end;
+            accent-color: #6366f1;
+            width: 1.25rem; height: 1.25rem;
+            border-radius: 0.25rem;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .modal {
+            display: none; position: fixed;
+            z-index: 1000; left: 0; top: 0;
+            width: 100%; height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+            justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe; margin: auto; padding: 2rem;
+            border-radius: 1rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 90%; max-width: 700px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .close-button {
+            color: #aaa; float: right;
+            font-size: 28px; font-weight: bold;
+            position: absolute; top: 10px; right: 20px;
+            cursor: pointer;
+        }
+        .close-button:hover, .close-button:focus { color: #000; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #6366f1;
+            border-radius: 50%; width: 24px; height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block; vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .official-link {
+            display: flex; align-items: center;
+            margin-top: 0.5rem; color: #4b5563;
+            font-size: 0.9rem;
+        }
+        .official-link i { margin-right: 0.4rem; color: #1e3a8a; }
+        .official-link:hover { text-decoration: underline; color: #1e3a8a; }
+    </style>
+</head>
+<body class="p-4">
+    <div class="container">
+        <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">Attrazioni di Berlino</h1>
+
+        <div class="filter-section grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Filtra per Tipologia -->
+            <div class="filter-group">
+                <label for="typeFilter">Filtra per Tipologia:</label>
+                <select id="typeFilter" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                    <option value="Tutti">Tutti</option>
+                    <option value="Monumento Storico">Monumento Storico</option>
+                    <option value="Edificio Governativo">Edificio Governativo</option>
+                    <option value="Galleria d'Arte all'Aperto">Galleria d'Arte all'Aperto</option>
+                    <option value="Complesso Museale">Complesso Museale</option>
+                    <option value="Sito Storico">Sito Storico</option>
+                    <option value="Memoriale">Memoriale</option>
+                    <option value="Punto Panoramico">Punto Panoramico</option>
+                    <option value="Edificio Religioso">Edificio Religioso</option>
+                </select>
+            </div>
+
+            <!-- Ordina per Prezzo -->
+            <div class="filter-group">
+                <label for="priceSort">Ordina per Prezzo:</label>
+                <select id="priceSort" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                    <option value="default">Predefinito</option>
+                    <option value="asc">Prezzo: Crescente</option>
+                    <option value="desc">Prezzo: Decrescente</option>
+                </select>
+            </div>
+
+            <!-- Filtra per Distanza -->
+            <div class="filter-group">
+                <label for="distanceFilter">Filtra per Distanza dal Centro:</label>
+                <select id="distanceFilter" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                    <option value="Tutti">Tutti</option>
+                    <option value="<2km">< 2 km</option>
+                    <option value=">2km">> 2 km</option>
+                </select>
+            </div>
+
+            <!-- Filtra per Berlin Welcome Card -->
+            <div class="filter-group">
+                <label>Incluso con Berlin Welcome Card:</label>
+                <div class="mt-2 flex items-center space-x-4">
+                    <input type="radio" id="cardAll" name="cityCardFilter" value="all" checked><label for="cardAll">Tutti</label>
+                    <input type="radio" id="cardIncluded" name="cityCardFilter" value="included"><label for="cardIncluded">Inclusi/Scontati</label>
+                    <input type="radio" id="cardNotIncluded" name="cityCardFilter" value="notIncluded"><label for="cardNotIncluded">Non inclusi</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end mb-4">
+            <button id="generateItineraryBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md">
+                <span id="buttonText">Genera Itinerario Personalizzato ✨</span>
+                <span id="loadingSpinner" class="spinner hidden"></span>
+            </button>
+        </div>
+
+        <div id="attractionsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Le attrazioni verranno caricate qui -->
+        </div>
+    </div>
+
+    <!-- Modale per l'itinerario -->
+    <div id="itineraryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Il Tuo Itinerario Personalizzato</h2>
+            <div id="itineraryContent" class="prose max-w-none"></div>
+        </div>
+    </div>
+
+    <script>
+        const attractionsData = [
+            { "Attrazione": "Porta di Brandeburgo", "Tipologia": "Monumento Storico", "Orari": "24h", "Distanza dal Centro": "1 km", "Prezzo (€)": 0.00, "Berlin WelcomeCard": "✓", "link": "https://www.berlin.de/sehenswuerdigkeiten/3560266-3558930-brandenburger-tor.html" },
+            { "Attrazione": "Palazzo del Reichstag", "Tipologia": "Edificio Governativo", "Orari": "08-24 (prenotazione obbligatoria)", "Distanza dal Centro": "1.2 km", "Prezzo (€)": 0.00, "Berlin WelcomeCard": "✓", "link": "https://www.bundestag.de/en/visitthebundestag" },
+            { "Attrazione": "East Side Gallery", "Tipologia": "Galleria d'Arte all'Aperto", "Orari": "24h", "Distanza dal Centro": "3 km", "Prezzo (€)": 0.00, "Berlin WelcomeCard": "✓", "link": "https://www.eastsidegallery-berlin.com/" },
+            { "Attrazione": "Isola dei Musei", "Tipologia": "Complesso Museale", "Orari": "10-18 (mar-dom)", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 24.00, "Berlin WelcomeCard": "25%", "link": "https://www.smb.museum/en/museums-institutions/museumsinsel-berlin/" },
+            { "Attrazione": "Checkpoint Charlie", "Tipologia": "Sito Storico", "Orari": "24h (sito esterno)", "Distanza dal Centro": "2.5 km", "Prezzo (€)": 0.00, "Berlin WelcomeCard": "✓", "link": "https://www.berlin.de/sehenswuerdigkeiten/3560262-3558930-checkpoint-charlie.html" },
+            { "Attrazione": "Memoriale dell'Olocausto", "Tipologia": "Memoriale", "Orari": "24h (memoriale), 10-20 (centro info)", "Distanza dal Centro": "1.1 km", "Prezzo (€)": 0.00, "Berlin WelcomeCard": "✓", "link": "https://www.stiftung-denkmal.de/en/" },
+            { "Attrazione": "Torre della Televisione", "Tipologia": "Punto Panoramico", "Orari": "10-23", "Distanza dal Centro": "2 km", "Prezzo (€)": 24.50, "Berlin WelcomeCard": "25%", "link": "https://tv-turm.de/en/" },
+            { "Attrazione": "Cattedrale di Berlino", "Tipologia": "Edificio Religioso", "Orari": "09-19", "Distanza dal Centro": "1.6 km", "Prezzo (€)": 10.00, "Berlin WelcomeCard": "25%", "link": "https://www.berlinerdom.de/en/" }
+        ];
+
+        const attractionsListDiv = document.getElementById('attractionsList');
+        const typeFilter = document.getElementById('typeFilter');
+        const priceSort = document.getElementById('priceSort');
+        const cityCardFilters = document.querySelectorAll('input[name="cityCardFilter"]');
+        const distanceFilter = document.getElementById('distanceFilter');
+        const generateItineraryBtn = document.getElementById('generateItineraryBtn');
+        const itineraryModal = document.getElementById('itineraryModal');
+        const closeButton = document.querySelector('.close-button');
+        const itineraryContent = document.getElementById('itineraryContent');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const buttonText = document.getElementById('buttonText');
+
+        function getNumericDistance(distanceString) {
+            const match = distanceString.match(/(\d+(\.\d+)?)/);
+            return match ? parseFloat(match[1]) : Infinity;
+        }
+
+        function renderAttractions(attractions) {
+            attractionsListDiv.innerHTML = '';
+            if (attractions.length === 0) {
+                attractionsListDiv.innerHTML = '<div class="no-results col-span-full">Nessun risultato.</div>';
+                return;
+            }
+            attractions.forEach(attraction => {
+                const card = document.createElement('div');
+                card.className = 'attraction-card';
+                let cardStatusText = '', cardStatusClass = '';
+                if (attraction["Berlin WelcomeCard"] === '✓') {
+                    cardStatusText = 'Incluso ✅';
+                    cardStatusClass = 'included';
+                } else if (attraction["Berlin WelcomeCard"] === '25%') {
+                    cardStatusText = 'Sconto 25% 🏷️';
+                    cardStatusClass = 'check-info';
+                } else {
+                    cardStatusText = 'Non incluso ❌';
+                    cardStatusClass = 'not-included';
+                }
+                const linkHtml = attraction.link ? `<a href="${attraction.link}" target="_blank" class="official-link"><i class="fas fa-external-link-alt"></i> Sito Ufficiale</a>` : '';
+                card.innerHTML = `
+                    <div>
+                        <div class="attraction-name">${attraction["Attrazione"]}</div>
+                        <div class="attraction-detail"><strong>Tipologia:</strong> ${attraction["Tipologia"]}</div>
+                        <div class="attraction-detail"><strong>Orari:</strong> ${attraction["Orari"]}</div>
+                        <div class="attraction-detail"><strong>Distanza:</strong> ${attraction["Distanza dal Centro"]}</div>
+                        <div class="attraction-detail price"><strong>Prezzo:</strong> €${attraction["Prezzo (€)"].toFixed(2)}</div>
+                        <div class="city-card-status ${cardStatusClass}"><strong>Card:</strong> ${cardStatusText}</div>
+                        ${linkHtml}
+                    </div>
+                    <input type="checkbox" class="attraction-checkbox" data-attraction-name="${attraction["Attrazione"]}">
+                `;
+                attractionsListDiv.appendChild(card);
+            });
+        }
+
+        function applyFiltersAndSort() {
+            let filtered = [...attractionsData];
+            if (typeFilter.value !== 'Tutti') {
+                filtered = filtered.filter(a => a["Tipologia"] === typeFilter.value);
+            }
+            const cardFilter = document.querySelector('input[name="cityCardFilter"]:checked').value;
+            if (cardFilter === 'included') {
+                filtered = filtered.filter(a => a["Berlin WelcomeCard"].includes('✓') || a["Berlin WelcomeCard"].includes('%'));
+            } else if (cardFilter === 'notIncluded') {
+                filtered = filtered.filter(a => !a["Berlin WelcomeCard"] || a["Berlin WelcomeCard"] === '');
+            }
+            const distFilter = distanceFilter.value;
+            if (distFilter !== 'Tutti') {
+                filtered = filtered.filter(a => {
+                    const dist = getNumericDistance(a["Distanza dal Centro"]);
+                    if (distFilter === '<2km') return dist < 2;
+                    if (distFilter === '>2km') return dist >= 2;
+                    return true;
+                });
+            }
+            if (priceSort.value === 'asc') {
+                filtered.sort((a, b) => a["Prezzo (€)"] - b["Prezzo (€)"]);
+            } else if (priceSort.value === 'desc') {
+                filtered.sort((a, b) => b["Prezzo (€)"] - a["Prezzo (€)"]);
+            }
+            renderAttractions(filtered);
+        }
+
+        async function generateItinerary() {
+            const selected = Array.from(document.querySelectorAll('.attraction-checkbox:checked')).map(cb => cb.dataset.attractionName);
+            if (selected.length === 0) {
+                itineraryContent.innerHTML = '<p class="text-red-600">Seleziona almeno un\'attrazione.</p>';
+                itineraryModal.style.display = 'flex';
+                return;
+            }
+            buttonText.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+            generateItineraryBtn.disabled = true;
+
+            const prompt = `Crea un itinerario di un giorno per visitare le seguenti attrazioni di Berlino, suggerendo un ordine logico e raggruppando quelle vicine. Le attrazioni sono: ${selected.join(', ')}. Rispondi in italiano.`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const result = await response.json();
+                if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    itineraryContent.innerHTML = result.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
+                } else {
+                    itineraryContent.innerHTML = '<p class="text-red-600">Errore nella generazione dell\'itinerario.</p>';
+                }
+            } catch (error) {
+                itineraryContent.innerHTML = `<p class="text-red-600">Errore di comunicazione: ${error.message}.</p>`;
+            } finally {
+                buttonText.classList.remove('hidden');
+                loadingSpinner.classList.add('hidden');
+                generateItineraryBtn.disabled = false;
+                itineraryModal.style.display = 'flex';
+            }
+        }
+
+        typeFilter.addEventListener('change', applyFiltersAndSort);
+        priceSort.addEventListener('change', applyFiltersAndSort);
+        cityCardFilters.forEach(radio => radio.addEventListener('change', applyFiltersAndSort));
+        distanceFilter.addEventListener('change', applyFiltersAndSort);
+        generateItineraryBtn.addEventListener('click', generateItinerary);
+        closeButton.onclick = () => itineraryModal.style.display = 'none';
+        window.onclick = (event) => { if (event.target === itineraryModal) itineraryModal.style.display = 'none'; };
+
+        applyFiltersAndSort();
+    </script>
+</body>
+</html>
