@@ -26,9 +26,8 @@
             background-color: #e0e7ff;
             padding: 1.5rem;
             border-radius: 0.75rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem; /* Reduced margin */
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
-            /* Adjusted for 4 columns on larger screens */
             grid-template-columns: repeat(1, minmax(0, 1fr));
         }
         @media (min-width: 768px) { /* md breakpoint */
@@ -38,7 +37,7 @@
         }
         @media (min-width: 1024px) { /* lg breakpoint */
             .filter-section {
-                grid-template-columns: repeat(4, minmax(0, 1fr)); /* Changed to 4 columns */
+                grid-template-columns: repeat(4, minmax(0, 1fr));
             }
         }
 
@@ -61,7 +60,7 @@
             transition: transform 0.2s ease-in-out;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Distributes space */
+            justify-content: space-between;
         }
         .attraction-card:hover {
             transform: translateY(-5px);
@@ -101,7 +100,6 @@
             color: #777;
             font-style: italic;
         }
-        /* Custom radio button styling */
         input[type="radio"] {
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -131,31 +129,27 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-
-        /* Checkbox styling */
         .attraction-checkbox {
             margin-top: 0.75rem;
-            align-self: flex-end; /* Pushes checkbox to the bottom right */
-            accent-color: #6366f1; /* Tailwind indigo-500 */
+            align-self: flex-end;
+            accent-color: #6366f1;
             width: 1.25rem;
             height: 1.25rem;
             border-radius: 0.25rem;
             border: 1px solid #ccc;
             cursor: pointer;
         }
-
-        /* Modal styles */
         .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1000; /* Sit on top */
+            display: none;
+            position: fixed;
+            z-index: 1000;
             left: 0;
             top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-            backdrop-filter: blur(5px); /* Blur background */
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
             justify-content: center;
             align-items: center;
         }
@@ -220,13 +214,19 @@
             text-decoration: underline;
             color: #2c5282;
         }
+        .form-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+            margin-top: 0.25rem;
+        }
     </style>
 </head>
 <body class="p-4">
     <div class="container">
         <h1 class="text-3xl font-bold text-center mb-6 text-blue-800">Attrazioni di Amsterdam</h1>
 
-        <!-- Link to official City Card website -->
         <div class="text-center mb-6">
             <a href="https://www.iamsterdam.com/it/biglietti/i-amsterdam-city-card?gad_source=1&gad_campaignid=1435356406&gbraid=0AAAAADRxZOESh_MOucJwrJAkVZJZakmeN&gclid=Cj0KCQjwss3DBhC3ARIsALdgYxNp-Z-lZQneX6BKeI5u0to7RgCwNyJLpssZzecjAdGU7-DaJRyw_lEaAoz5EALw_wcB" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
                 Acquista la I amsterdam City Card <i class="fas fa-external-link-alt ml-2"></i>
@@ -257,7 +257,7 @@
                 </select>
             </div>
 
-            <!-- Filter by Distance from Center (moved here) -->
+            <!-- Filter by Distance from Center -->
             <div class="filter-group">
                 <label for="distanceFilter" class="block text-sm">Filtra per Distanza dal Centro:</label>
                 <select id="distanceFilter" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
@@ -286,7 +286,10 @@
             </div>
         </div>
 
-        <div class="flex justify-end mb-4">
+        <div class="flex justify-between items-center mb-4">
+            <button id="addAttractionBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                <i class="fas fa-plus mr-2"></i>Aggiungi un'attrazione
+            </button>
             <button id="generateItineraryBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out flex items-center">
                 <span id="buttonText">Genera Itinerario Personalizzato ✨</span>
                 <span id="loadingSpinner" class="spinner hidden"></span>
@@ -298,14 +301,60 @@
         </div>
     </div>
 
-    <!-- The Modal -->
+    <!-- Itinerary Modal -->
     <div id="itineraryModal" class="modal">
         <div class="modal-content">
-            <span class="close-button">&times;</span>
+            <span class="close-button" id="closeItineraryModal">&times;</span>
             <h2 class="text-2xl font-bold mb-4 text-blue-800">Il Tuo Itinerario Personalizzato</h2>
-            <div id="itineraryContent" class="prose max-w-none">
-                <!-- Itinerary content will be loaded here -->
-            </div>
+            <div id="itineraryContent" class="prose max-w-none"></div>
+        </div>
+    </div>
+
+    <!-- Add Attraction Modal -->
+    <div id="addAttractionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeAddAttractionModal">&times;</span>
+            <h2 class="text-2xl font-bold mb-4 text-green-800">Aggiungi Nuova Attrazione</h2>
+            <form id="addAttractionForm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="attractionName" class="block font-semibold">Nome</label>
+                        <input type="text" id="attractionName" class="form-input" required>
+                    </div>
+                    <div>
+                        <label for="attractionType" class="block font-semibold">Tipologia</label>
+                        <select id="attractionType" class="form-input" required>
+                            <option value="Museo d'arte/storia">Museo d'arte/storia</option>
+                            <option value="Scienza e natura">Scienza e natura</option>
+                            <option value="Esperienze e Famiglie">Esperienze e Famiglie</option>
+                            <option value="Panorami e Architettura">Panorami e Architettura</option>
+                            <option value="Tour e Trasporti">Tour e Trasporti</option>
+                            <option value="Altro">Altro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="attractionHours" class="block font-semibold">Orari</label>
+                        <input type="text" id="attractionHours" class="form-input" required>
+                    </div>
+                    <div>
+                        <label for="attractionDistance" class="block font-semibold">Distanza dal Centro (es. 2.5 km)</label>
+                        <input type="text" id="attractionDistance" class="form-input" required>
+                    </div>
+                    <div>
+                        <label for="attractionPrice" class="block font-semibold">Prezzo (€)</label>
+                        <input type="number" step="0.01" id="attractionPrice" class="form-input" required>
+                    </div>
+                    <div>
+                        <label for="attractionLink" class="block font-semibold">Link Sito Ufficiale</label>
+                        <input type="url" id="attractionLink" class="form-input">
+                    </div>
+                </div>
+                <div class="mt-6 text-right">
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md">
+                        Salva Attrazione
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -349,14 +398,10 @@
             { "Attrazione": "De Oude Kerk", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-18 (lun-sab)", "Distanza dal Centro": "0.5 km", "Prezzo (€)": 13.50, "I amsterdam City Card": "✓", "link": "https://oudekerk.nl/en/" },
             { "Attrazione": "Verzetsmuseum (Museo della Resistenza Olandese)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Distanza dal Centro": "2.0 km", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://www.verzetsmuseum.org/" },
             { "Attrazione": "Woonbootmuseum (Museo delle Case Galleggianti)", "Tipologia": "Esperienze e Famiglie", "Orari 2025": "Vari", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 5.00, "I amsterdam City Card": "✓", "link": "https://houseboatmuseum.nl/en/" },
-
-            // Altre attrazioni e attività incluse
             { "Attrazione": "A'DAM LOOKOUT", "Tipologia": "Panorami e Architettura", "Orari 2025": "10-22", "Distanza dal Centro": "0.8 km (traghetto)", "Prezzo (€)": 18.50, "I amsterdam City Card": "✓", "link": "https://www.adamlookout.com/" },
             { "Attrazione": "Crociera sui canali (es. Blue Boat, Lovers)", "Tipologia": "Tour e Trasporti", "Orari 2025": "Partenze varie", "Distanza dal Centro": "Varie", "Prezzo (€)": 18.50, "I amsterdam City Card": "✓", "link": "https://www.rederijkooij.nl/en/" },
             { "Attrazione": "Uso illimitato trasporti pubblici GVB", "Tipologia": "Tour e Trasporti", "Orari 2025": "24h", "Distanza dal Centro": "N/A", "Prezzo (€)": 0.00, "I amsterdam City Card": "✓", "link": "https://www.iamsterdam.com/it/biglietti/usare-la-city-card" },
             { "Attrazione": "Noleggio bici 24h", "Tipologia": "Tour e Trasporti", "Orari 2025": "Orario libero", "Distanza dal Centro": "N/A", "Prezzo (€)": 15.00, "I amsterdam City Card": "✓", "link": "https://www.qualitybikerentamsterdam.nl/" },
-
-            // Attrazioni e musei fuori Amsterdam (inclusi nel prezzo o con sconti)
             { "Attrazione": "Frans Hals Museum (Haarlem)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "20 km", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓", "link": "https://franshalsmuseum.nl/en/" },
             { "Attrazione": "Teylers Museum (Haarlem)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "20 km", "Prezzo (€)": 16.00, "I amsterdam City Card": "✓", "link": "https://www.teylersmuseum.nl/en/" },
             { "Attrazione": "Verwey Museum (Haarlem)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "Vari", "Distanza dal Centro": "20 km", "Prezzo (€)": 8.00, "I amsterdam City Card": "✓", "link": "https://www.verweymuseum.nl/" },
@@ -369,8 +414,6 @@
             { "Attrazione": "Zuiderzee Museum (Enkhuizen)", "Tipologia": "Tour e Trasporti", "Orari 2025": "Vari", "Distanza dal Centro": "60 km", "Prezzo (€)": 19.00, "I amsterdam City Card": "✓", "link": "https://www.zuiderzeemuseum.nl/en/" },
             { "Attrazione": "Volendam-Marken ferry express", "Tipologia": "Tour e Trasporti", "Orari 2025": "30 min", "Distanza dal Centro": "20 km", "Prezzo (€)": 9.50, "I amsterdam City Card": "✓", "link": "https://www.volendammarkenexpress.nl/en/" },
             { "Attrazione": "Castello di Muiderslot", "Tipologia": "Panorami e Architettura", "Orari 2025": "Vari", "Distanza dal Centro": "15 km", "Prezzo (€)": 17.50, "I amsterdam City Card": "✓", "link": "https://muiderslot.nl/en/" },
-
-            // Sconti (generalmente 25% su attrazioni, spettacoli, ristoranti e negozi)
             { "Attrazione": "Amsterdam Dungeon", "Tipologia": "Tour e Trasporti", "Orari 2025": "11-18", "Distanza dal Centro": "0.5 km", "Prezzo (€)": 24.00, "I amsterdam City Card": "25%", "link": "https://www.thedungeons.com/amsterdam/en/" },
             { "Attrazione": "Tour dello stadio Johan Cruyff Arena", "Tipologia": "Tour e Trasporti", "Orari 2025": "09-17", "Distanza dal Centro": "9 km", "Prezzo (€)": 28.00, "I amsterdam City Card": "25%", "link": "https://english.ajax.nl/fans/johan-cruijff-arena-stadium-tour" },
             { "Attrazione": "Body Worlds", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-22", "Distanza dal Centro": "0.3 km", "Prezzo (€)": 22.50, "I amsterdam City Card": "25%", "link": "https://www.bodyworlds.nl/" },
@@ -389,8 +432,6 @@
             { "Attrazione": "Boom Chicago", "Tipologia": "Tour e Trasporti", "Orari 2025": "Serale", "Distanza dal Centro": "1.0 km", "Prezzo (€)": 25.00, "I amsterdam City Card": "25%", "link": "https://boomchicago.nl/" },
             { "Attrazione": "Muziekgebouw aan 't IJ - Musica contemporanea e classica", "Tipologia": "Tour e Trasporti", "Orari 2025": "Vari", "Distanza dal Centro": "1.5 km", "Prezzo (€)": 25.00, "I amsterdam City Card": "25%", "link": "https://www.muziekgebouw.nl/en" },
             { "Attrazione": "Nationale Opera & Ballet", "Tipologia": "Tour e Trasporti", "Orari 2025": "Vari", "Distanza dal Centro": "1.0 km", "Prezzo (€)": 30.00, "I amsterdam City Card": "25%", "link": "https://www.operaballet.nl/en" },
-
-            // Attrazioni non incluse/scontate (dati precedenti non specificati dall'utente come inclusi/scontati nella nuova lista)
             { "Attrazione": "Amsterdam Museum (sul fiume Amstel)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "10-17", "Distanza dal Centro": "0.8 km", "Prezzo (€)": 15.00, "I amsterdam City Card": "", "link": "https://www.amsterdammuseum.nl/en" },
             { "Attrazione": "Van Gogh Museum", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-19 (ven 21)", "Distanza dal Centro": "2.5 km", "Prezzo (€)": 24.00, "I amsterdam City Card": "", "link": "https://www.vangoghmuseum.nl/en" },
             { "Attrazione": "Fabrique des Lumières (senza sconto)", "Tipologia": "Museo d'arte/storia", "Orari 2025": "09-22", "Distanza dal Centro": "3.5 km", "Prezzo (€)": 24.00, "I amsterdam City Card": "", "link": "https://www.fabrique-lumieres.com/en" },
@@ -401,44 +442,39 @@
             { "Attrazione": "Zaanse Schans (solo area, senza card)", "Tipologia": "Tour e Trasporti", "Orari 2025": "10-17", "Distanza dal Centro": "15 km", "Prezzo (€)": 12.00, "I amsterdam City Card": "", "link": "https://www.zaanseschans.nl/en/" }
         ];
 
+        // DOM Elements
         const attractionsListDiv = document.getElementById('attractionsList');
         const typeFilter = document.getElementById('typeFilter');
         const priceSort = document.getElementById('priceSort');
         const cityCardFilters = document.querySelectorAll('input[name="cityCardFilter"]');
-        const distanceFilter = document.getElementById('distanceFilter'); // New filter element
+        const distanceFilter = document.getElementById('distanceFilter');
+        
+        // Itinerary Modal Elements
         const generateItineraryBtn = document.getElementById('generateItineraryBtn');
         const itineraryModal = document.getElementById('itineraryModal');
-        const closeButton = document.querySelector('.close-button');
+        const closeItineraryModalBtn = document.getElementById('closeItineraryModal');
         const itineraryContent = document.getElementById('itineraryContent');
         const loadingSpinner = document.getElementById('loadingSpinner');
         const buttonText = document.getElementById('buttonText');
 
-        // Funzione per estrarre la distanza numerica da una stringa
+        // Add Attraction Modal Elements
+        const addAttractionBtn = document.getElementById('addAttractionBtn');
+        const addAttractionModal = document.getElementById('addAttractionModal');
+        const closeAddAttractionModalBtn = document.getElementById('closeAddAttractionModal');
+        const addAttractionForm = document.getElementById('addAttractionForm');
+
         function getNumericDistance(distanceString) {
-            if (distanceString === "N/A" || distanceString === "Varie") {
-                return Infinity; // Treat N/A or "Varie" as very far for filtering
-            }
+            if (distanceString === "N/A" || distanceString === "Varie") return Infinity;
             const match = distanceString.match(/(\d+(\.\d+)?)\s*km/);
-            if (match) {
-                return parseFloat(match[1]);
-            }
-            // Handle cases like "0.8 km (traghetto)"
-            const ferryMatch = distanceString.match(/(\d+(\.\d+)?)\s*km\s*\(traghetto\)/);
-            if (ferryMatch) {
-                return parseFloat(ferryMatch[1]);
-            }
-            return Infinity; // Default for unparseable strings
+            return match ? parseFloat(match[1]) : Infinity;
         }
 
-        // Funzione per renderizzare le attrazioni
         function renderAttractions(attractions) {
-            attractionsListDiv.innerHTML = ''; // Pulisce i risultati precedenti
-
+            attractionsListDiv.innerHTML = '';
             if (attractions.length === 0) {
                 attractionsListDiv.innerHTML = '<div class="no-results col-span-full">Nessun risultato trovato per i filtri selezionati.</div>';
                 return;
             }
-
             attractions.forEach(attraction => {
                 const card = document.createElement('div');
                 card.className = 'attraction-card';
@@ -456,19 +492,16 @@
                     cityCardStatusClass = 'not-included';
                 }
 
-                // Crea il link HTML
                 const linkHtml = attraction.link ?
-                    `<a href="${attraction.link}" target="_blank" class="official-link">
-                        <i class="fas fa-external-link-alt"></i> Sito Ufficiale
-                    </a>` :
+                    `<a href="${attraction.link}" target="_blank" class="official-link"><i class="fas fa-external-link-alt"></i> Sito Ufficiale</a>` :
                     `<div class="official-link text-gray-500">Link non disponibile</div>`;
 
                 card.innerHTML = `
                     <div>
                         <div class="attraction-name">${attraction["Attrazione"]}</div>
                         <div class="attraction-detail"><strong>Tipologia:</strong> ${attraction["Tipologia"]}</div>
-                        <div class="attraction-detail"><strong>Orari 2025:</strong> ${attraction["Orari 2025"]}</div>
-                        <div class="attraction-detail"><strong>Distanza dal Centro:</strong> ${attraction["Distanza dal Centro"]}</div>
+                        <div class="attraction-detail"><strong>Orari:</strong> ${attraction["Orari 2025"]}</div>
+                        <div class="attraction-detail"><strong>Distanza:</strong> ${attraction["Distanza dal Centro"]}</div>
                         <div class="attraction-detail price"><strong>Prezzo:</strong> €${attraction["Prezzo (€)"].toFixed(2)}</div>
                         <div class="city-card-status ${cityCardStatusClass}"><strong>City Card:</strong> ${cityCardStatusText}</div>
                         ${linkHtml}
@@ -479,33 +512,28 @@
             });
         }
 
-        // Funzione per applicare filtri e ordinamento
         function applyFiltersAndSort() {
             let filteredAttractions = [...attractionsData];
-
-            // Filtra per Tipologia
             const selectedType = typeFilter.value;
             if (selectedType !== 'Tutti') {
-                filteredAttractions = filteredAttractions.filter(attraction => attraction["Tipologia"] === selectedType);
+                filteredAttractions = filteredAttractions.filter(attr => attr["Tipologia"] === selectedType);
             }
 
-            // Filtra per Inclusione City Card
             const selectedCityCardFilter = document.querySelector('input[name="cityCardFilter"]:checked').value;
             if (selectedCityCardFilter === 'included') {
-                filteredAttractions = filteredAttractions.filter(attraction => attraction["I amsterdam City Card"] === '✓');
+                filteredAttractions = filteredAttractions.filter(attr => attr["I amsterdam City Card"] === '✓');
             } else if (selectedCityCardFilter === 'notIncluded') {
-                filteredAttractions = filteredAttractions.filter(attraction => attraction["I amsterdam City Card"] === '' || attraction["I amsterdam City Card"] === '25%');
+                filteredAttractions = filteredAttractions.filter(attr => !attr["I amsterdam City Card"] || attr["I amsterdam City Card"] === '25%');
             }
 
-            // Filtra per Distanza dal Centro
             const selectedDistance = distanceFilter.value;
             if (selectedDistance !== 'Tutti') {
-                filteredAttractions = filteredAttractions.filter(attraction => {
-                    const distance = getNumericDistance(attraction["Distanza dal Centro"]);
+                filteredAttractions = filteredAttractions.filter(attr => {
+                    const distance = getNumericDistance(attr["Distanza dal Centro"]);
                     switch (selectedDistance) {
                         case '<1km': return distance < 1;
                         case '1-3km': return distance >= 1 && distance <= 3;
-                        case '>3km': return distance > 3 && distance <= 10; // Assuming >3km up to 10km for this category
+                        case '>3km': return distance > 3 && distance <= 10;
                         case '>10km': return distance > 10 && distance <= 50;
                         case '>50km': return distance > 50;
                         default: return true;
@@ -513,7 +541,6 @@
                 });
             }
 
-            // Ordina per Prezzo
             const sortOrder = priceSort.value;
             if (sortOrder === 'asc') {
                 filteredAttractions.sort((a, b) => a["Prezzo (€)"] - b["Prezzo (€)"]);
@@ -524,7 +551,6 @@
             renderAttractions(filteredAttractions);
         }
 
-        // Funzione per generare l'itinerario usando l'API Gemini
         async function generateItinerary() {
             const selectedCheckboxes = document.querySelectorAll('.attraction-checkbox:checked');
             const selectedAttractions = Array.from(selectedCheckboxes).map(cb => cb.dataset.attractionName);
@@ -535,17 +561,13 @@
                 return;
             }
 
-            // Mostra lo spinner di caricamento
             buttonText.classList.add('hidden');
             loadingSpinner.classList.remove('hidden');
             generateItineraryBtn.disabled = true;
 
             const prompt = `Crea un itinerario di un giorno per visitare le seguenti attrazioni di Amsterdam. Per ogni attrazione, suggerisci l'ordine di visita, una stima del tempo necessario e un breve punto saliente. Se possibile, raggruppa le attrazioni vicine. Le attrazioni sono: ${selectedAttractions.join(', ')}.`;
-
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiKey = ""; // Se vuoi usare modelli diversi da gemini-2.0-flash o imagen-3.0-generate-002, fornisci una chiave API qui. Altrimenti, lascia così com'è.
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const apiKey = "";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
             try {
@@ -555,48 +577,61 @@
                     body: JSON.stringify(payload)
                 });
                 const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
                     const text = result.candidates[0].content.parts[0].text;
-                    itineraryContent.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`; // Visualizza la risposta, sostituisce i newline con <br>
+                    itineraryContent.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`;
                 } else {
                     itineraryContent.innerHTML = '<p class="text-red-600">Errore nella generazione dell\'itinerario. Riprova.</p>';
-                    console.error('Unexpected API response structure:', result);
                 }
             } catch (error) {
-                itineraryContent.innerHTML = `<p class="text-red-600">Si è verificato un errore durante la comunicazione con l'AI: ${error.message}.</p>`;
-                console.error('Error calling Gemini API:', error);
+                itineraryContent.innerHTML = `<p class="text-red-600">Si è verificato un errore: ${error.message}.</p>`;
             } finally {
-                // Nascondi lo spinner di caricamento
                 buttonText.classList.remove('hidden');
                 loadingSpinner.classList.add('hidden');
                 generateItineraryBtn.disabled = false;
-                itineraryModal.style.display = 'flex'; // Mostra il modale dopo la risposta o l'errore
+                itineraryModal.style.display = 'flex';
             }
         }
-
+        
         // Event Listeners
         typeFilter.addEventListener('change', applyFiltersAndSort);
         priceSort.addEventListener('change', applyFiltersAndSort);
         cityCardFilters.forEach(radio => radio.addEventListener('change', applyFiltersAndSort));
-        distanceFilter.addEventListener('change', applyFiltersAndSort); // New event listener for distance filter
+        distanceFilter.addEventListener('change', applyFiltersAndSort);
         generateItineraryBtn.addEventListener('click', generateItinerary);
 
-        // Chiudi il modale quando si clicca il pulsante di chiusura
-        closeButton.addEventListener('click', () => {
-            itineraryModal.style.display = 'none';
-        });
-
-        // Chiudi il modale quando si clicca al di fuori di esso
+        // Itinerary Modal Listeners
+        closeItineraryModal.addEventListener('click', () => itineraryModal.style.display = 'none');
+        
+        // Add Attraction Modal Listeners
+        addAttractionBtn.addEventListener('click', () => addAttractionModal.style.display = 'flex');
+        closeAddAttractionModal.addEventListener('click', () => addAttractionModal.style.display = 'none');
+        
+        // Window listener to close modals on outside click
         window.addEventListener('click', (event) => {
-            if (event.target === itineraryModal) {
-                itineraryModal.style.display = 'none';
-            }
+            if (event.target === itineraryModal) itineraryModal.style.display = 'none';
+            if (event.target === addAttractionModal) addAttractionModal.style.display = 'none';
         });
 
-        // Render iniziale
+        // Handle Add Attraction Form Submission
+        addAttractionForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const newAttraction = {
+                "Attrazione": document.getElementById('attractionName').value,
+                "Tipologia": document.getElementById('attractionType').value,
+                "Orari 2025": document.getElementById('attractionHours').value,
+                "Distanza dal Centro": document.getElementById('attractionDistance').value,
+                "Prezzo (€)": parseFloat(document.getElementById('attractionPrice').value),
+                "I amsterdam City Card": "", // Manually added attractions are not included by default
+                "link": document.getElementById('attractionLink').value
+            };
+            attractionsData.push(newAttraction);
+            addAttractionForm.reset();
+            addAttractionModal.style.display = 'none';
+            applyFiltersAndSort();
+        });
+
+        // Initial Render
         applyFiltersAndSort();
     </script>
 </body>
