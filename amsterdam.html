@@ -218,7 +218,7 @@
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Firebase Configuration ---
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
@@ -488,6 +488,7 @@
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             db = getFirestore(app); // Assign to the db variable in the higher scope
+            setLogLevel('debug');
 
             onAuthStateChanged(auth, user => {
                 if (user) {
@@ -536,15 +537,23 @@
                 alert("Errore: ID utente non disponibile. Impossibile salvare.");
                 return;
             }
+            
+            const submitButton = addAttractionForm.querySelector('button[type="submit"]');
+            const priceValue = document.getElementById('attractionPrice').value;
+
             const newAttraction = {
                 "Attrazione": document.getElementById('attractionName').value,
                 "Tipologia": document.getElementById('attractionType').value,
                 "Orari 2025": document.getElementById('attractionHours').value,
                 "Distanza dal Centro": document.getElementById('attractionDistance').value,
-                "Prezzo (€)": parseFloat(document.getElementById('attractionPrice').value),
+                "Prezzo (€)": priceValue ? parseFloat(priceValue) : 0, // FIX: Handle empty price
                 "I amsterdam City Card": "",
                 "link": document.getElementById('attractionLink').value
             };
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Salvataggio...';
+
             try {
                 const userAttractionsCollection = collection(db, `/artifacts/${appId}/users/${currentUserId}/attractions`);
                 await addDoc(userAttractionsCollection, newAttraction);
@@ -553,6 +562,9 @@
             } catch (error) {
                 console.error("Errore nell'aggiungere l'attrazione: ", error);
                 alert("Si è verificato un errore durante il salvataggio. Riprova.");
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Salva Attrazione';
             }
         });
 
