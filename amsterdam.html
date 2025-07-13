@@ -107,13 +107,25 @@
             padding: 1rem;
             margin-bottom: 1.5rem;
             border-radius: 0.75rem;
-            text-align: center;
             font-size: 0.9rem;
         }
         #userIdDisplay {
             font-weight: 600;
             color: #4338ca;
             word-break: break-all;
+            margin-top: 0.5rem;
+        }
+        #loadUserSection {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        #loadUserIdInput {
+            flex-grow: 1;
+            border: 1px solid #ccc;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
         }
     </style>
 </head>
@@ -122,8 +134,14 @@
         <h1 class="text-3xl font-bold text-center mb-6 text-blue-800">Attrazioni di Amsterdam</h1>
 
         <div id="userIdContainer" class="hidden">
-            <span>Salva questo ID per accedere alla tua lista da altri dispositivi:</span>
-            <div id="userIdDisplay" class="mt-2"></div>
+            <div class="text-center">
+                <span>Il tuo ID Utente per questa sessione è:</span>
+                <div id="userIdDisplay">Caricamento...</div>
+            </div>
+            <div id="loadUserSection">
+                <input type="text" id="loadUserIdInput" placeholder="Incolla un ID per caricare la lista" class="form-input">
+                <button id="loadUserIdBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg shadow-md">Carica</button>
+            </div>
         </div>
 
         <div class="text-center mb-6">
@@ -203,14 +221,8 @@
         import { getFirestore, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Firebase Configuration ---
-        // These variables are placeholders and will be provided by the environment.
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
 
         // --- Initial Data ---
         const initialAttractionsData = [
@@ -298,8 +310,10 @@
         
         // --- Global State ---
         let currentAttractions = [...initialAttractionsData];
-        let userAttractionsCollection;
-
+        let currentUserId = null;
+        let unsubscribeFromSnapshots = null;
+        let db; // Declare db in the higher scope
+        
         // --- DOM Elements ---
         const attractionsListDiv = document.getElementById('attractionsList');
         const typeFilter = document.getElementById('typeFilter');
@@ -318,50 +332,185 @@
         const addAttractionForm = document.getElementById('addAttractionForm');
         const userIdContainer = document.getElementById('userIdContainer');
         const userIdDisplay = document.getElementById('userIdDisplay');
+        const loadUserIdInput = document.getElementById('loadUserIdInput');
+        const loadUserIdBtn = document.getElementById('loadUserIdBtn');
 
-        // --- Functions ---
-        function getNumericDistance(distanceString) { /* ... same as before ... */ return 0; }
-        function renderAttractions(attractions) { /* ... same as before ... */ }
-        function applyFiltersAndSort() { /* ... same as before, but uses `currentAttractions` ... */ }
-        async function generateItinerary() { /* ... same as before ... */ }
+        // --- Core Functions ---
+        function getNumericDistance(distanceString) {
+            if (typeof distanceString !== 'string' || distanceString === "N/A" || distanceString === "Varie") {
+                return Infinity;
+            }
+            const match = distanceString.match(/(\d+(\.\d+)?)\s*km/);
+            if (match) {
+                return parseFloat(match[1]);
+            }
+            return Infinity;
+        }
 
-        // --- Authentication and Data Loading ---
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                // User is signed in.
-                const userId = user.uid;
-                userIdDisplay.textContent = userId;
-                userIdContainer.classList.remove('hidden');
+        function renderAttractions(attractions) {
+            attractionsListDiv.innerHTML = '';
+            if (attractions.length === 0) {
+                attractionsListDiv.innerHTML = '<div class="no-results col-span-full">Nessun risultato trovato.</div>';
+                return;
+            }
+            attractions.forEach(attraction => {
+                const card = document.createElement('div');
+                card.className = 'attraction-card';
+                let cityCardStatusText = 'Non incluso ❌';
+                let cityCardStatusClass = 'not-included';
+                if (attraction["I amsterdam City Card"] === '✓') {
+                    cityCardStatusText = 'Incluso ✅';
+                    cityCardStatusClass = 'included';
+                } else if (attraction["I amsterdam City Card"] === '25%') {
+                    cityCardStatusText = 'Sconto 25% 🏷️';
+                    cityCardStatusClass = 'check-info';
+                }
+                const linkHtml = attraction.link ? `<a href="${attraction.link}" target="_blank" class="official-link"><i class="fas fa-external-link-alt"></i> Sito Ufficiale</a>` : `<div class="official-link text-gray-500">Link non disponibile</div>`;
+                card.innerHTML = `
+                    <div>
+                        <div class="attraction-name">${attraction["Attrazione"]}</div>
+                        <div class="attraction-detail"><strong>Tipologia:</strong> ${attraction["Tipologia"]}</div>
+                        <div class="attraction-detail"><strong>Orari:</strong> ${attraction["Orari 2025"]}</div>
+                        <div class="attraction-detail"><strong>Distanza:</strong> ${attraction["Distanza dal Centro"]}</div>
+                        <div class="attraction-detail price"><strong>Prezzo:</strong> €${(attraction["Prezzo (€)"] || 0).toFixed(2)}</div>
+                        <div class="city-card-status ${cityCardStatusClass}"><strong>City Card:</strong> ${cityCardStatusText}</div>
+                        ${linkHtml}
+                    </div>
+                    <input type="checkbox" class="attraction-checkbox" data-attraction-name="${attraction["Attrazione"]}">`;
+                attractionsListDiv.appendChild(card);
+            });
+        }
 
-                // Path to the user's private collection of attractions
-                const collectionPath = `/artifacts/${appId}/users/${userId}/attractions`;
-                userAttractionsCollection = collection(db, collectionPath);
-
-                // Listen for real-time updates
-                onSnapshot(userAttractionsCollection, (snapshot) => {
-                    const userAddedAttractions = [];
-                    snapshot.forEach(doc => {
-                        userAddedAttractions.push(doc.data());
-                    });
-                    
-                    // Combine initial data with user's data
-                    currentAttractions = [...initialAttractionsData, ...userAddedAttractions];
-                    applyFiltersAndSort();
-                });
-
-            } else {
-                // User is signed out. Sign in anonymously.
-                signInAnonymously(auth).catch(error => {
-                    console.error("Error signing in anonymously:", error);
+        function applyFiltersAndSort() {
+            let filteredAttractions = [...currentAttractions];
+            const selectedType = typeFilter.value;
+            if (selectedType !== 'Tutti') {
+                filteredAttractions = filteredAttractions.filter(attr => attr["Tipologia"] === selectedType);
+            }
+            const selectedCityCardFilter = document.querySelector('input[name="cityCardFilter"]:checked').value;
+            if (selectedCityCardFilter === 'included') {
+                filteredAttractions = filteredAttractions.filter(attr => attr["I amsterdam City Card"] === '✓');
+            } else if (selectedCityCardFilter === 'notIncluded') {
+                filteredAttractions = filteredAttractions.filter(attr => !attr["I amsterdam City Card"] || attr["I amsterdam City Card"] === '25%');
+            }
+            const selectedDistance = distanceFilter.value;
+            if (selectedDistance !== 'Tutti') {
+                filteredAttractions = filteredAttractions.filter(attr => {
+                    const distance = getNumericDistance(attr["Distanza dal Centro"]);
+                    switch (selectedDistance) {
+                        case '<1km': return distance < 1;
+                        case '1-3km': return distance >= 1 && distance <= 3;
+                        case '>3km': return distance > 3 && distance <= 10;
+                        case '>10km': return distance > 10 && distance <= 50;
+                        case '>50km': return distance > 50;
+                        default: return true;
+                    }
                 });
             }
-        });
-        
+            const sortOrder = priceSort.value;
+            if (sortOrder === 'asc') {
+                filteredAttractions.sort((a, b) => (a["Prezzo (€)"] || 0) - (b["Prezzo (€)"] || 0));
+            } else if (sortOrder === 'desc') {
+                filteredAttractions.sort((a, b) => (b["Prezzo (€)"] || 0) - (a["Prezzo (€)"] || 0));
+            }
+            renderAttractions(filteredAttractions);
+        }
+
+        async function generateItinerary() {
+            const selectedCheckboxes = document.querySelectorAll('.attraction-checkbox:checked');
+            const selectedAttractions = Array.from(selectedCheckboxes).map(cb => cb.dataset.attractionName);
+
+            if (selectedAttractions.length === 0) {
+                itineraryContent.innerHTML = '<p class="text-red-600">Seleziona almeno un\'attrazione per generare un itinerario.</p>';
+                itineraryModal.style.display = 'flex';
+                return;
+            }
+
+            buttonText.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+            generateItineraryBtn.disabled = true;
+
+            const prompt = `Crea un itinerario di un giorno per visitare le seguenti attrazioni di Amsterdam. Per ogni attrazione, suggerisci l'ordine di visita, una stima del tempo necessario e un breve punto saliente. Se possibile, raggruppa le attrazioni vicine. Le attrazioni sono: ${selectedAttractions.join(', ')}.`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    itineraryContent.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`;
+                } else {
+                    itineraryContent.innerHTML = '<p class="text-red-600">Errore nella generazione dell\'itinerario. Riprova.</p>';
+                }
+            } catch (error) {
+                itineraryContent.innerHTML = `<p class="text-red-600">Si è verificato un errore: ${error.message}.</p>`;
+            } finally {
+                buttonText.classList.remove('hidden');
+                loadingSpinner.classList.add('hidden');
+                generateItineraryBtn.disabled = false;
+                itineraryModal.style.display = 'flex';
+            }
+        }
+
+        // --- Firebase Logic ---
+        function loadAttractionsForUser(userId) {
+            if (unsubscribeFromSnapshots) {
+                unsubscribeFromSnapshots(); // Detach previous listener
+            }
+            currentUserId = userId;
+            userIdDisplay.textContent = userId;
+            userIdContainer.classList.remove('hidden');
+
+            const userAttractionsCollection = collection(db, `/artifacts/${appId}/users/${userId}/attractions`);
+            
+            unsubscribeFromSnapshots = onSnapshot(userAttractionsCollection, (snapshot) => {
+                const userAddedAttractions = [];
+                snapshot.forEach(doc => {
+                    userAddedAttractions.push(doc.data());
+                });
+                currentAttractions = [...initialAttractionsData, ...userAddedAttractions];
+                applyFiltersAndSort();
+            }, (error) => {
+                console.error("Error fetching user attractions:", error);
+                currentAttractions = [...initialAttractionsData]; // Fallback to initial data
+                applyFiltersAndSort();
+            });
+        }
+
+        // --- App Initialization ---
+        try {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            db = getFirestore(app); // Assign to the db variable in the higher scope
+
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    loadAttractionsForUser(user.uid);
+                } else {
+                    signInAnonymously(auth).catch(error => {
+                        console.error("Error signing in anonymously:", error);
+                        // If auth fails, render initial data anyway
+                        applyFiltersAndSort();
+                    });
+                }
+            });
+        } catch (e) {
+            console.error("Firebase initialization failed. Running in offline mode.", e);
+            applyFiltersAndSort(); // Render initial data if Firebase fails
+        }
+
         // --- Event Listeners ---
         typeFilter.addEventListener('change', applyFiltersAndSort);
         priceSort.addEventListener('change', applyFiltersAndSort);
         cityCardFilters.forEach(radio => radio.addEventListener('change', applyFiltersAndSort));
         distanceFilter.addEventListener('change', applyFiltersAndSort);
+        
         generateItineraryBtn.addEventListener('click', generateItinerary);
         closeItineraryModal.addEventListener('click', () => itineraryModal.style.display = 'none');
         addAttractionBtn.addEventListener('click', () => addAttractionModal.style.display = 'flex');
@@ -371,33 +520,39 @@
             if (event.target === addAttractionModal) addAttractionModal.style.display = 'none';
         });
 
-        // Handle Add Attraction Form Submission
+        loadUserIdBtn.addEventListener('click', () => {
+            const idToLoad = loadUserIdInput.value.trim();
+            if (idToLoad) {
+                loadAttractionsForUser(idToLoad);
+                alert(`Lista per l'ID ${idToLoad} caricata.`);
+            } else {
+                alert("Per favore, inserisci un ID valido.");
+            }
+        });
+
         addAttractionForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            if (!userAttractionsCollection) {
-                alert("Devi essere autenticato per aggiungere attrazioni.");
+            if (!currentUserId) {
+                alert("Errore: ID utente non disponibile. Impossibile salvare.");
                 return;
             }
-
             const newAttraction = {
                 "Attrazione": document.getElementById('attractionName').value,
                 "Tipologia": document.getElementById('attractionType').value,
                 "Orari 2025": document.getElementById('attractionHours').value,
                 "Distanza dal Centro": document.getElementById('attractionDistance').value,
                 "Prezzo (€)": parseFloat(document.getElementById('attractionPrice').value),
-                "I amsterdam City Card": "", // Manually added attractions are not included by default
+                "I amsterdam City Card": "",
                 "link": document.getElementById('attractionLink').value
             };
-            
             try {
-                // Add the new attraction to the user's collection in Firestore
+                const userAttractionsCollection = collection(db, `/artifacts/${appId}/users/${currentUserId}/attractions`);
                 await addDoc(userAttractionsCollection, newAttraction);
                 addAttractionForm.reset();
                 addAttractionModal.style.display = 'none';
-                // The onSnapshot listener will automatically update the UI
             } catch (error) {
                 console.error("Errore nell'aggiungere l'attrazione: ", error);
-                alert("Si è verificato un errore. Riprova.");
+                alert("Si è verificato un errore durante il salvataggio. Riprova.");
             }
         });
 
