@@ -27,6 +27,7 @@
             border-radius: 0.75rem;
             margin-bottom: 1rem;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+            display: grid; /* Changed to display grid */
             grid-template-columns: repeat(1, minmax(0, 1fr));
         }
         @media (min-width: 768px) { .filter-section { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -101,7 +102,7 @@
         .official-link i { margin-right: 0.4rem; color: #2c5282; }
         .official-link:hover { text-decoration: underline; color: #2c5282; }
         .form-input { width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 0.5rem; margin-top: 0.25rem; }
-        #userIdContainer {
+        #listIdContainer {
             background-color: #fff;
             border: 2px dashed #6366f1;
             padding: 1rem;
@@ -109,19 +110,19 @@
             border-radius: 0.75rem;
             font-size: 0.9rem;
         }
-        #userIdDisplay {
+        #listIdDisplay {
             font-weight: 600;
             color: #4338ca;
             word-break: break-all;
             margin-top: 0.5rem;
         }
-        #loadUserSection {
+        #loadListSection {
             margin-top: 1rem;
             display: flex;
             gap: 0.5rem;
             align-items: center;
         }
-        #loadUserIdInput {
+        #loadListIdInput {
             flex-grow: 1;
             border: 1px solid #ccc;
             padding: 0.5rem;
@@ -133,14 +134,14 @@
     <div class="container">
         <h1 class="text-3xl font-bold text-center mb-6 text-blue-800">Attrazioni di Amsterdam</h1>
 
-        <div id="userIdContainer">
+        <div id="listIdContainer">
             <div class="text-center">
-                <span>Il tuo ID Utente per questa sessione è:</span>
-                <div id="userIdDisplay">Caricamento...</div>
+                <span>Il tuo ID Lista condivisibile è:</span>
+                <div id="listIdDisplay">Caricamento...</div>
             </div>
-            <div id="loadUserSection">
-                <input type="text" id="loadUserIdInput" placeholder="Incolla un ID per caricare la lista" class="form-input">
-                <button id="loadUserIdBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg shadow-md">Carica</button>
+            <div id="loadListSection">
+                <input type="text" id="loadListIdInput" placeholder="Incolla un ID per caricare una lista" class="form-input">
+                <button id="loadListIdBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg shadow-md">Carica</button>
             </div>
         </div>
 
@@ -310,9 +311,11 @@
         
         // --- Global State ---
         let currentAttractions = [...initialAttractionsData];
-        let currentUserId = null;
+        let currentListId = null;
         let unsubscribeFromSnapshots = null;
-        let db; // Declare db in the higher scope
+        let db;
+        let auth;
+        let isAuthReady = false;
         
         // --- DOM Elements ---
         const attractionsListDiv = document.getElementById('attractionsList');
@@ -330,10 +333,10 @@
         const addAttractionModal = document.getElementById('addAttractionModal');
         const closeAddAttractionModal = document.getElementById('closeAddAttractionModal');
         const addAttractionForm = document.getElementById('addAttractionForm');
-        const userIdContainer = document.getElementById('userIdContainer');
-        const userIdDisplay = document.getElementById('userIdDisplay');
-        const loadUserIdInput = document.getElementById('loadUserIdInput');
-        const loadUserIdBtn = document.getElementById('loadUserIdBtn');
+        const listIdContainer = document.getElementById('listIdContainer');
+        const listIdDisplay = document.getElementById('listIdDisplay');
+        const loadListIdInput = document.getElementById('loadListIdInput');
+        const loadListIdBtn = document.getElementById('loadListIdBtn');
 
         // --- Core Functions ---
         function getNumericDistance(distanceString) {
@@ -341,10 +344,7 @@
                 return Infinity;
             }
             const match = distanceString.match(/(\d+(\.\d+)?)\s*km/);
-            if (match) {
-                return parseFloat(match[1]);
-            }
-            return Infinity;
+            return match ? parseFloat(match[1]) : Infinity;
         }
 
         function renderAttractions(attractions) {
@@ -459,17 +459,22 @@
         }
 
         // --- Firebase Logic ---
-        function loadAttractionsForUser(userId) {
-            if (unsubscribeFromSnapshots) {
-                unsubscribeFromSnapshots(); // Detach previous listener
+        function loadAttractionsForList(listId) {
+            if (!isAuthReady) {
+                console.log("Auth not ready, deferring list load.");
+                return;
             }
-            currentUserId = userId;
-            userIdDisplay.textContent = userId;
-            userIdContainer.classList.remove('hidden');
+            if (unsubscribeFromSnapshots) {
+                unsubscribeFromSnapshots();
+            }
+            currentListId = listId;
+            localStorage.setItem('amsterdamListId', listId);
+            listIdDisplay.textContent = listId;
+            listIdContainer.classList.remove('hidden');
 
-            const userAttractionsCollection = collection(db, `/artifacts/${appId}/users/${userId}/attractions`);
+            const listItemsCollection = collection(db, `/artifacts/${appId}/public/data/attraction-lists/${listId}/items`);
             
-            unsubscribeFromSnapshots = onSnapshot(userAttractionsCollection, (snapshot) => {
+            unsubscribeFromSnapshots = onSnapshot(listItemsCollection, (snapshot) => {
                 const userAddedAttractions = [];
                 snapshot.forEach(doc => {
                     userAddedAttractions.push(doc.data());
@@ -477,8 +482,8 @@
                 currentAttractions = [...initialAttractionsData, ...userAddedAttractions];
                 applyFiltersAndSort();
             }, (error) => {
-                console.error("Error fetching user attractions:", error);
-                currentAttractions = [...initialAttractionsData]; // Fallback to initial data
+                console.error("Error fetching list items:", error);
+                currentAttractions = [...initialAttractionsData];
                 applyFiltersAndSort();
             });
         }
@@ -486,24 +491,29 @@
         // --- App Initialization ---
         try {
             const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            db = getFirestore(app); // Assign to the db variable in the higher scope
+            auth = getAuth(app);
+            db = getFirestore(app);
             setLogLevel('debug');
 
             onAuthStateChanged(auth, user => {
                 if (user) {
-                    loadAttractionsForUser(user.uid);
-                } else {
-                    signInAnonymously(auth).catch(error => {
-                        console.error("Error signing in anonymously:", error);
-                        // If auth fails, render initial data anyway
-                        applyFiltersAndSort();
-                    });
+                    isAuthReady = true;
+                    let listId = localStorage.getItem('amsterdamListId');
+                    if (!listId) {
+                        listId = crypto.randomUUID();
+                    }
+                    loadAttractionsForList(listId);
                 }
             });
+
+            signInAnonymously(auth).catch(error => {
+                console.error("Error signing in anonymously:", error);
+                applyFiltersAndSort();
+            });
+
         } catch (e) {
             console.error("Firebase initialization failed. Running in offline mode.", e);
-            applyFiltersAndSort(); // Render initial data if Firebase fails
+            applyFiltersAndSort();
         }
 
         // --- Event Listeners ---
@@ -515,16 +525,19 @@
         generateItineraryBtn.addEventListener('click', generateItinerary);
         closeItineraryModal.addEventListener('click', () => itineraryModal.style.display = 'none');
         addAttractionBtn.addEventListener('click', () => addAttractionModal.style.display = 'flex');
-        closeAddAttractionModal.addEventListener('click', () => addAttractionModal.style.display = 'none');
+        closeAddAttractionModal.addEventListener('click', () => {
+            addAttractionForm.reset();
+            addAttractionModal.style.display = 'none';
+        });
         window.addEventListener('click', (event) => {
             if (event.target === itineraryModal) itineraryModal.style.display = 'none';
             if (event.target === addAttractionModal) addAttractionModal.style.display = 'none';
         });
 
-        loadUserIdBtn.addEventListener('click', () => {
-            const idToLoad = loadUserIdInput.value.trim();
+        loadListIdBtn.addEventListener('click', () => {
+            const idToLoad = loadListIdInput.value.trim();
             if (idToLoad) {
-                loadAttractionsForUser(idToLoad);
+                loadAttractionsForList(idToLoad);
                 alert(`Lista per l'ID ${idToLoad} caricata.`);
             } else {
                 alert("Per favore, inserisci un ID valido.");
@@ -533,8 +546,8 @@
 
         addAttractionForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            if (!currentUserId) {
-                alert("Errore: ID utente non disponibile. Impossibile salvare.");
+            if (!currentListId) {
+                alert("Errore: ID della lista non disponibile. Impossibile salvare.");
                 return;
             }
             
@@ -546,7 +559,7 @@
                 "Tipologia": document.getElementById('attractionType').value,
                 "Orari 2025": document.getElementById('attractionHours').value,
                 "Distanza dal Centro": document.getElementById('attractionDistance').value,
-                "Prezzo (€)": priceValue ? parseFloat(priceValue) : 0, // FIX: Handle empty price
+                "Prezzo (€)": priceValue ? parseFloat(priceValue) : 0,
                 "I amsterdam City Card": "",
                 "link": document.getElementById('attractionLink').value
             };
@@ -555,8 +568,8 @@
             submitButton.textContent = 'Salvataggio...';
 
             try {
-                const userAttractionsCollection = collection(db, `/artifacts/${appId}/users/${currentUserId}/attractions`);
-                await addDoc(userAttractionsCollection, newAttraction);
+                const listItemsCollection = collection(db, `/artifacts/${appId}/public/data/attraction-lists/${currentListId}/items`);
+                await addDoc(listItemsCollection, newAttraction);
                 addAttractionForm.reset();
                 addAttractionModal.style.display = 'none';
             } catch (error) {
