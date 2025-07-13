@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scegli o Aggiungi la tua Città</title>
+    <title>Scegli la tua Città</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -24,153 +24,73 @@
             background-color: #ffffff;
             border-radius: 1rem;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center; /* Assicura che il contenuto nel container sia centrato */
+        }
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #2c5282;
+            margin-bottom: 1.5rem;
+        }
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            margin-bottom: 1.5rem; 
+            background-color: #f8fafc;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%234A5568'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.25rem;
             text-align: center;
+            padding-right: 2.5rem;
         }
-        .form-input {
-             margin-top: 0.25rem; display: block; width: 100%;
-             padding: 0.75rem; border: 1px solid #d1d5db;
-             border-radius: 0.5rem; box-shadow: sm;
-        }
-        .btn {
-            color: white; font-weight: 600;
-            padding: 0.75rem 1.5rem; border-radius: 0.75rem;
+        button {
+            background-color: #6366f1;
+            color: white;
+            font-weight: 600;
+            /* Il padding è stato spostato inline per forzare l'aggiornamento */
+            box-shadow: 0 2px 6px rgba(99, 102, 240, 0.3);
             transition: background-color 0.3s ease, transform 0.2s ease;
-            cursor: pointer; border: none;
+            cursor: pointer;
+            border: none; /* Rimuove il bordo predefinito */
         }
-        .btn-primary { background-color: #6366f1; }
-        .btn-primary:hover { background-color: #4f46e5; transform: translateY(-2px); }
-        .btn-secondary { background-color: #6b7280; }
-        .btn-secondary:hover { background-color: #4b5563; }
-        .hidden { display: none; }
+        button:hover {
+            background-color: #4f46e5;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Benvenuto!</h1>
-        <p class="text-lg mb-4">Scegli una città o aggiungine una nuova.</p>
-
-        <!-- Selettore Città -->
-        <select id="citySelect" class="form-input mb-4 text-center">
-            <option>Caricamento città...</option>
+        <p class="text-lg mb-6">Scegli la città che desideri esplorare:</p>
+        
+        <select id="citySelect">
+            <option value="amsterdam.html">Amsterdam</option>
+            <option value="berlino.html">Berlino</option>
+            <!-- Aggiungi altre città qui in futuro, es: <option value="roma.html">Roma</option> -->
         </select>
-        <button id="exploreButton" class="btn btn-primary w-full mb-6" style="padding: 1rem 2rem;">Esplora</button>
+        
+        <!-- Distanziatore per forzare lo spazio -->
+        <div style="height: 2rem;"></div>
 
-        <hr class="my-6">
-
-        <!-- Form per Aggiungere Città -->
-        <div>
-            <h2 class="text-xl font-semibold mb-3">Non trovi la tua città?</h2>
-            <form id="addCityForm" class="flex items-center gap-2">
-                <input type="text" id="newCityName" placeholder="Nome della città" class="form-input flex-grow" required>
-                <button type="submit" class="btn btn-secondary" style="padding: 0.75rem;">Aggiungi</button>
-            </form>
-            <p id="feedbackMessage" class="text-sm mt-2 h-4"></p>
-        </div>
+        <!-- MODIFICA: Stile applicato direttamente qui per forzare l'aggiornamento -->
+        <button id="exploreButton" style="padding: 1rem 4rem; border-radius: 50px;">Esplora</button>
     </div>
 
-    <script type="module">
-        // Import delle funzioni di Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, onSnapshot, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Configurazione e inizializzazione di Firebase
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'city-explorer-app';
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        // Elementi del DOM
-        const citySelect = document.getElementById('citySelect');
-        const exploreButton = document.getElementById('exploreButton');
-        const addCityForm = document.getElementById('addCityForm');
-        const newCityNameInput = document.getElementById('newCityName');
-        const feedbackMessage = document.getElementById('feedbackMessage');
-
-        // **FIX**: Corrected the Firestore path to have an odd number of segments.
-        const CITIES_COLLECTION_PATH = `artifacts/${appId}/public/data/cities`;
-        const citiesCollection = collection(db, CITIES_COLLECTION_PATH);
-
-        // Funzione per inizializzare le città predefinite se non esistono
-        async function initializeDefaultCities() {
-            const querySnapshot = await getDocs(citiesCollection);
-            if (querySnapshot.empty) {
-                console.log("Nessuna città trovata, inizializzo quelle predefinite.");
-                const defaultCities = ["Amsterdam", "Berlino"];
-                for (const cityName of defaultCities) {
-                    await setDoc(doc(db, CITIES_COLLECTION_PATH, cityName), { name: cityName });
-                }
-            }
-        }
-
-        // Gestione Autenticazione e Caricamento Dati
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // Mostra subito le città predefinite per una migliore esperienza utente
-                citySelect.innerHTML = `
-                    <option value="Amsterdam">Amsterdam</option>
-                    <option value="Berlino">Berlino</option>
-                `;
-                exploreButton.disabled = false;
-
-                await initializeDefaultCities();
-
-                // Ascolta i cambiamenti nella collezione delle città per mantenere la lista aggiornata
-                onSnapshot(citiesCollection, (snapshot) => {
-                    const currentSelection = citySelect.value; // Salva la selezione corrente
-                    citySelect.innerHTML = ''; // Pulisce le opzioni
-                    if (snapshot.empty) {
-                        citySelect.innerHTML = '<option>Nessuna città disponibile</option>';
-                        exploreButton.disabled = true;
-                    } else {
-                        snapshot.docs.sort((a, b) => a.id.localeCompare(b.id)).forEach(doc => {
-                            const city = doc.data();
-                            const option = document.createElement('option');
-                            option.value = city.name;
-                            option.textContent = city.name;
-                            citySelect.appendChild(option);
-                        });
-                        citySelect.value = currentSelection; // Ripristina la selezione se ancora presente
-                        exploreButton.disabled = false;
-                    }
-                });
-
-            } else {
-                // Esegue il login se non autenticato
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            }
-        });
-
-        // Evento per il pulsante Esplora
-        exploreButton.addEventListener('click', () => {
-            const selectedCity = citySelect.value;
-            if (selectedCity) {
-                window.open(`city.html?name=${encodeURIComponent(selectedCity)}`, '_self');
-            }
-        });
-
-        // Evento per il form di aggiunta città
-        addCityForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newCityName = newCityNameInput.value.trim();
-
-            if (newCityName) {
-                try {
-                    await setDoc(doc(db, CITIES_COLLECTION_PATH, newCityName), { name: newCityName });
-                    feedbackMessage.textContent = `"${newCityName}" aggiunta con successo!`;
-                    feedbackMessage.style.color = 'green';
-                    newCityNameInput.value = '';
-                } catch (error) {
-                    console.error("Errore nell'aggiungere la città: ", error);
-                    feedbackMessage.textContent = "Errore durante l'aggiunta.";
-                    feedbackMessage.style.color = 'red';
-                }
-                setTimeout(() => feedbackMessage.textContent = '', 3000);
+    <script>
+        document.getElementById('exploreButton').addEventListener('click', function() {
+            const citySelect = document.getElementById('citySelect');
+            const selectedPage = citySelect.value;
+            if (selectedPage) {
+                // Reindirizza alla pagina selezionata
+                window.open(selectedPage, '_self'); 
             }
         });
     </script>
